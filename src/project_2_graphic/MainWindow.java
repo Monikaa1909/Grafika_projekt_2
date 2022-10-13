@@ -1,14 +1,15 @@
 package project_2_graphic;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,13 +19,16 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 
 public class MainWindow extends JFrame{
-    private BufferedImage img;
+    private BufferedImage img, resizedImage;
     private ImageIcon imgIcon;
+    Graphics2D graphics2D;
     private JPanel imgPanel;
 
     private static String comment = null;
+//    private static final List<String> comments = new ArrayList<String>();
     private static int file_type;   // 1 - jpg/jpeg, 3 - p3, 6 - p6
     private static int width, height, maks_color;
+    int targetWidth, targetHeight;
     
     public MainWindow() {
         super("THE COOLEST COMPUTER GRAPHICS PROGRAM");
@@ -36,14 +40,19 @@ public class MainWindow extends JFrame{
         JPanel buttons = new JPanel(new FlowLayout());
         JButton saveButton = new JButton("Save");
         JButton openButton = new JButton("Load");
+        JButton increaseButton = new JButton("+");
+        JButton reduceButton = new JButton("-");
         saveButton.addActionListener(new SaveListener());
         openButton.addActionListener(new LoadListener());
+        increaseButton.addActionListener(new increaseListener());
+        reduceButton.addActionListener(new reduceListener());
         buttons.add(openButton);
         buttons.add(saveButton);
+        buttons.add(increaseButton);
+        buttons.add(reduceButton);
         setSize(750, 700);
         setDefaultCloseOperation(MainWindow.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        
 
         imgPanel = new JPanel();
         add(buttons, BorderLayout.NORTH);
@@ -68,6 +77,17 @@ public class MainWindow extends JFrame{
                 pack();
                 setLocationRelativeTo(null);
                 repaint();
+
+                for (int y = 0; y < img.getHeight(); y++) {
+                    for (int x = 0; x < img.getWidth(); x++) {
+//                        System.out.println(img.getRGB(x, y));
+//                        int RGBA = img.getRGB(x, y);
+//                        int alpha = (RGBA >> 24) & 255;
+//                        int red = (RGBA >> 16) & 255;
+//                        int green = (RGBA >> 8) & 255;
+//                        int blue = RGBA & 255;
+                    }
+                }
             }
         }
     }
@@ -83,10 +103,8 @@ public class MainWindow extends JFrame{
             FileNameExtensionFilter p6 = new FileNameExtensionFilter("Obraz PPM P6", "ppm");
             FileNameExtensionFilter jpg = new FileNameExtensionFilter("Obraz JPG", "jpg");
 
-            if (file_type != 1) {
-                fileChooser.addChoosableFileFilter(p3);
-                fileChooser.addChoosableFileFilter(p6);
-            }
+            fileChooser.addChoosableFileFilter(p3);
+            fileChooser.addChoosableFileFilter(p6);
             fileChooser.addChoosableFileFilter(jpg);
             fileChooser.removeChoosableFileFilter(fileChooser.getAcceptAllFileFilter());
             if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
@@ -96,6 +114,49 @@ public class MainWindow extends JFrame{
                 }
                 save(img, file.getAbsolutePath(), fileChooser.getFileFilter().getDescription());
             }
+        }
+    }
+
+    private class increaseListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            targetWidth = (int) (2 * img.getWidth());
+            targetHeight = (int) (2 * img.getHeight());
+
+            resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+            graphics2D = resizedImage.createGraphics();
+            graphics2D.drawImage(img, 0, 0, targetWidth, targetHeight, null);
+            graphics2D.dispose();
+
+            img = resizedImage;
+            imgIcon.setImage(img);
+            pack();
+            setLocationRelativeTo(null);
+            repaint();
+        }
+    }
+
+    private class reduceListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            targetWidth = (int) (0.5 * img.getWidth());
+            targetHeight = (int) (0.5 * img.getHeight());
+
+            RenderingHints rh = new RenderingHints(
+                    RenderingHints.KEY_TEXT_ANTIALIASING,
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+            resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+            graphics2D = resizedImage.createGraphics();
+            graphics2D.setRenderingHints(rh);
+            graphics2D.drawImage(img, 0, 0, targetWidth, targetHeight, null);
+            graphics2D.dispose();
+
+            img = resizedImage;
+            imgIcon.setImage(img);
+//            pack();
+            setLocationRelativeTo(null);
+            repaint();
         }
     }
 
@@ -143,10 +204,13 @@ public class MainWindow extends JFrame{
                 Path path = Paths.get(s);
 
                 byte[] data = Files.readAllBytes(path);
-
+                char[] dataParsed = new char[data.length];
                 for (int j = 0; j < data.length; j++) {
-                    System.out.println((char) data[j]);
+                    dataParsed[j] = (char) data[j];
                 }
+//                for (int j = 0; j < data.length; j++) {
+//                    System.out.println((char) data[j]);
+//                }
                 if (((char) data[0]) != 'P' || ((char) data[1] != '3' && (char) data[1] != '6')) {
                     JOptionPane.showMessageDialog(null, "Plik jest nieprawidłowy.");
                     return null;
@@ -161,8 +225,75 @@ public class MainWindow extends JFrame{
                         comment += (char) data[i];
                     }
                 }
-                String temp = "";
 
+                String temp = "";
+                boolean isComment = false;
+                int loadedParameters = 0;
+                String currentComment = "";
+
+                while (loadedParameters < 3) {
+                    if ((char) data[i] == '#') {
+                        isComment = true;
+                        i++;
+                        continue;
+                    }
+
+                    if (isComment && (char) data[i] != '\n') {
+                        currentComment += (char) data[i++];
+                        continue;
+                    } else if (isComment && (char) data[i] == '\n') {
+                        i++;
+//                        comments.add(currentComment);
+                        currentComment = "";
+                        isComment = false;
+                        continue;
+                    }
+
+                    switch (loadedParameters) {
+                        case 0:
+                            while (Character.isDigit((char) data[i])) {
+                                temp += (char) data[i++];
+                            }
+
+                            if ((!Character.isDigit((char) data[i]) || (char) data[i] == '\n') && temp != "") {
+                                width = Integer.parseInt(temp);
+                                temp = "";
+                                loadedParameters++;
+                                continue;
+                            }
+
+                            i++;
+                            break;
+                        case 1:
+                            while (Character.isDigit((char) data[i])) {
+                                temp += (char) data[i++];
+                            }
+
+                            if ((!Character.isDigit((char) data[i]) || (char) data[i] == '\n') && temp != "") {
+                                height = Integer.parseInt(temp);
+                                temp = "";
+                                loadedParameters++;
+                                continue;
+                            }
+
+                            i++;
+                            break;
+                        case 2:
+                            while (Character.isDigit((char) data[i])) {
+                                temp += (char) data[i++];
+                            }
+
+                            if ((!Character.isDigit((char) data[i]) || (char) data[i] == '\n') && temp != "") {
+                                maks_color = Integer.parseInt(temp);
+                                temp = "";
+                                loadedParameters++;
+                                continue;
+                            }
+
+                            i++;
+                            break;
+                    }
+                }
                 while (Character.isDigit((char) data[++i])) {
                     temp += (char) data[i];
                 }
@@ -277,7 +408,7 @@ public class MainWindow extends JFrame{
                 }
                 bufferedImage.setRGB(j, i, toRGB(red, green, blue));
             }
-            System.out.println("");
+//            System.out.println("");
         }
         return bufferedImage;
     }
@@ -285,33 +416,30 @@ public class MainWindow extends JFrame{
     private static void saveAsP3(BufferedImage img, File f) {
         try {
             PrintWriter pw = new PrintWriter(f);
-            pw.println("P3");
-            System.out.println("p3");
+            // sprawdzenie komentarza i dodanie go
+            pw.write("P3" + "\n");
             if (comment != null) {
-//                System.out.println(comment);
-                pw.println(comment);
+                pw.write(comment + "\n");
             }
-            pw.println(img.getWidth() + " " + img.getHeight());
-            System.out.println("img.getWidth() + \" \" + img.getHeight()" + img.getWidth() + " " + img.getHeight());
-            pw.println(255);
-            System.out.println("255");
+            pw.write(img.getWidth() + " ");
+            // sprawdzenie komentarza i dodanie go
+            pw.write(img.getHeight() + "\n");
+            // sprawdzenie komentarza i dodanie go
+            pw.write(255 + "\n");
+            // sprawdzenie komentarza i dodanie go
             int rgb;
             for (int i = 0; i < img.getHeight(); i++) {
                 for (int j = 0; j < img.getWidth(); j++) {
                     rgb = img.getRGB(j, i);
                     pw.println(getRed(rgb));
-                    System.out.println("getRed(rgb)" + getRed(rgb));
                     pw.println(getGreen(rgb));
-                    System.out.println("getGreen(rgb)"+ getGreen(rgb));
                     pw.println(getBlue(rgb));
-                    System.out.println("getBlue(rgb)" + getBlue(rgb));
-
                 }
             }
             pw.close();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(null, "BŁĄDMFDJKHVNEFK");
+            JOptionPane.showMessageDialog(null, "Error while writing to file in ppm p3 format :(");
         }
 
     }
@@ -319,11 +447,15 @@ public class MainWindow extends JFrame{
     private static void saveAsP6(BufferedImage img, File f) {
         try {
             FileOutputStream fos = new FileOutputStream(f);
-            String s = new String("P6\n" + String.valueOf(img.getWidth()) + " "
-                    + String.valueOf(img.getHeight()) + "\n"
-                    + String.valueOf(255) + "\n");
-
-            fos.write(s.getBytes("US-ASCII"));
+            // sprawdzenie komentarza i dodanie go
+            fos.write(("P6" + "\n").getBytes("US-ASCII"));
+            // sprawdzenie komentarza i dodanie go
+            fos.write((String.valueOf(img.getWidth()) + " ").getBytes("US-ASCII"));
+            // sprawdzenie komentarza i dodanie go
+            fos.write((String.valueOf(img.getHeight()) + "\n").getBytes("US-ASCII"));
+            // sprawdzenie komentarza i dodanie go
+            fos.write((String.valueOf(255) + "\n").getBytes("US-ASCII"));
+            // sprawdzenie komentarza i dodanie go
             int rgb;
             for (int i = 0; i < img.getHeight(); i++) {
                 for (int j = 0; j < img.getWidth(); j++) {
