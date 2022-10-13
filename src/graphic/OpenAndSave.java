@@ -52,7 +52,6 @@ public class OpenAndSave {
         if (desc.charAt(desc.length() - 1) == '6') {
             p6Save(img, new File(s + ".ppm"));
         }
-
     }
 
     public static BufferedImage wczytaj(String s) {
@@ -64,6 +63,7 @@ public class OpenAndSave {
         }
 
         BufferedImage bi = null;
+        //dsfmksd
 
         if (extension.equals("jpg") || extension.equals("jpeg")) {
             try {
