@@ -1,4 +1,4 @@
-package graphic;
+package project_2_graphic;
 
 import java.awt.EventQueue;
 
@@ -8,7 +8,7 @@ public class Main {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                Okno o = new Okno();
+                MainWindow o = new MainWindow();
                 o.setVisible(true);
             }
         });
