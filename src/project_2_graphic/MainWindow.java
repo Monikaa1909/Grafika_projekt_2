@@ -294,6 +294,7 @@ public class MainWindow extends JFrame{
                             break;
                     }
                 }
+                /* stara wersja która średnio działała xd
                 while (Character.isDigit((char) data[++i])) {
                     temp += (char) data[i];
                 }
@@ -312,7 +313,7 @@ public class MainWindow extends JFrame{
                     temp += (char) data[i];
                 }
 
-                maks_color = Integer.parseInt(temp);
+                maks_color = Integer.parseInt(temp);*/
 
                 if (file_type == 3) {
                     return p3(s);
