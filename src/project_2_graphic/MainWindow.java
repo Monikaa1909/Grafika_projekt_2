@@ -5,11 +5,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,7 +26,7 @@ public class MainWindow extends JFrame{
     private JPanel imgPanel;
 
     private static String comment = null;
-//    private static final List<String> comments = new ArrayList<String>();
+    private static final List<Comment> comments = new ArrayList<Comment>();
     private static int file_type;   // 1 - jpg/jpeg, 3 - p3, 6 - p6
     private static int width, height, maks_color;
     int targetWidth, targetHeight;
@@ -112,6 +113,7 @@ public class MainWindow extends JFrame{
                 if (file == null) {
                     return;
                 }
+
                 save(img, file.getAbsolutePath(), fileChooser.getFileFilter().getDescription());
             }
         }
@@ -208,9 +210,7 @@ public class MainWindow extends JFrame{
                 for (int j = 0; j < data.length; j++) {
                     dataParsed[j] = (char) data[j];
                 }
-//                for (int j = 0; j < data.length; j++) {
-//                    System.out.println((char) data[j]);
-//                }
+
                 if (((char) data[0]) != 'P' || ((char) data[1] != '3' && (char) data[1] != '6')) {
                     JOptionPane.showMessageDialog(null, "Plik jest nieprawidłowy.");
                     return null;
@@ -226,96 +226,8 @@ public class MainWindow extends JFrame{
                     }
                 }
 
-                String temp = "";
-                boolean isComment = false;
-                int loadedParameters = 0;
-                String currentComment = "";
-
-                while (loadedParameters < 3) {
-                    if ((char) data[i] == '#') {
-                        isComment = true;
-                        i++;
-                        continue;
-                    }
-
-                    if (isComment && (char) data[i] != '\n') {
-                        currentComment += (char) data[i++];
-                        continue;
-                    } else if (isComment && (char) data[i] == '\n') {
-                        i++;
-//                        comments.add(currentComment);
-                        currentComment = "";
-                        isComment = false;
-                        continue;
-                    }
-
-                    switch (loadedParameters) {
-                        case 0:
-                            while (Character.isDigit((char) data[i])) {
-                                temp += (char) data[i++];
-                            }
-
-                            if ((!Character.isDigit((char) data[i]) || (char) data[i] == '\n') && temp != "") {
-                                width = Integer.parseInt(temp);
-                                temp = "";
-                                loadedParameters++;
-                                continue;
-                            }
-
-                            i++;
-                            break;
-                        case 1:
-                            while (Character.isDigit((char) data[i])) {
-                                temp += (char) data[i++];
-                            }
-
-                            if ((!Character.isDigit((char) data[i]) || (char) data[i] == '\n') && temp != "") {
-                                height = Integer.parseInt(temp);
-                                temp = "";
-                                loadedParameters++;
-                                continue;
-                            }
-
-                            i++;
-                            break;
-                        case 2:
-                            while (Character.isDigit((char) data[i])) {
-                                temp += (char) data[i++];
-                            }
-
-                            if ((!Character.isDigit((char) data[i]) || (char) data[i] == '\n') && temp != "") {
-                                maks_color = Integer.parseInt(temp);
-                                temp = "";
-                                loadedParameters++;
-                                continue;
-                            }
-
-                            i++;
-                            break;
-                    }
-                }
-                while (Character.isDigit((char) data[++i])) {
-                    temp += (char) data[i];
-                }
-
-                width = Integer.parseInt(temp);
-
-                temp = "";
-                while (Character.isDigit((char) data[++i])) {
-                    temp += (char) data[i];
-                }
-
-                height = Integer.parseInt(temp);
-
-                temp = "";
-                while (Character.isDigit((char) data[++i])) {
-                    temp += (char) data[i];
-                }
-
-                maks_color = Integer.parseInt(temp);
-
                 if (file_type == 3) {
-                    return p3(s);
+                    return p3(s, data, i);
                 }
 
                 return p6(data, i);
@@ -332,45 +244,154 @@ public class MainWindow extends JFrame{
         return bufferedImage;
     }
 
-    private static BufferedImage p3(String s) {
+    private static BufferedImage p3(String s, byte[] data, int currentIndex) {
         FileReader fileReader = null;
         BufferedImage bufferedImage = null;
         try {
+
             fileReader = new FileReader(s);
             BufferedReader br = new BufferedReader(fileReader);
             Scanner in = new Scanner(br);
-            in.nextLine();
-            while (in.hasNext("#")) {
-                in.nextLine();
-            }
-            in.nextLine();
-            in.nextLine();
+            String temp = "";
+            boolean isComment = false;
+            int loadedParameters = 0;
+            String currentComment = "";
+            List<Integer> nextColors = new ArrayList<>();
+            int currentColor = 0;
+            int red = 0, green = 0, blue;
+            int row = 0;
+            int col = 0;
+            while (loadedParameters < 4) {
+                if ((char) data[currentIndex] == '#') {
+                    isComment = true;
+                    currentIndex++;
+                    continue;
+                }
 
-            bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            int red, green, blue;
-            for (int i = 0; i < height; i++) {
-                for (int j = 0; j < width; j++) {
+                if (isComment && (char) data[currentIndex] != '\n') {
+                    currentComment += (char) data[currentIndex++];
+                    continue;
+                } else if (isComment && (char) data[currentIndex] == '\n') {
+                    currentIndex++;
+                    comments.add(new Comment(currentComment, currentIndex));
+                    currentComment = "";
+                    isComment = false;
+                    continue;
+                }
 
-                    red = in.nextInt();
-                    red *= 255;
-                    red /= maks_color;
+                switch (loadedParameters) {
+                    case 0:
+                        while (Character.isDigit((char) data[currentIndex])) {
+                            temp += (char) data[currentIndex++];
+                        }
 
-                    green = in.nextInt();
-                    green *= 255;
-                    green /= maks_color;
+                        if ((!Character.isDigit((char) data[currentIndex]) || (char) data[currentIndex] == '\n') && temp != "") {
+                            width = Integer.parseInt(temp);
+                            temp = "";
+                            loadedParameters++;
+                            continue;
+                        }
 
-                    blue = in.nextInt();
-                    blue *= 255;
-                    blue /= maks_color;
+                        currentIndex++;
+                        break;
+                    case 1:
+                        while (Character.isDigit((char) data[currentIndex])) {
+                            temp += (char) data[currentIndex++];
+                        }
 
-                    if (red > maks_color || green > maks_color || blue > maks_color) {
-                        JOptionPane.showMessageDialog(null, "Something is wrong with the file... " +
-                                "the colors exceed the maximum values :o");
-                        return null;
-                    }
-                    bufferedImage.setRGB(j, i, toRGB(red, green, blue));
+                        if ((!Character.isDigit((char) data[currentIndex]) || (char) data[currentIndex] == '\n') && temp != "") {
+                            height = Integer.parseInt(temp);
+                            temp = "";
+                            loadedParameters++;
+                            continue;
+                        }
+
+                        currentIndex++;
+                        break;
+                    case 2:
+                        while (Character.isDigit((char) data[currentIndex])) {
+                            temp += (char) data[currentIndex++];
+                        }
+
+                        if ((!Character.isDigit((char) data[currentIndex]) || (char) data[currentIndex] == '\n') && temp != "") {
+                            maks_color = Integer.parseInt(temp);
+                            temp = "";
+                            loadedParameters++;
+                            continue;
+                        }
+
+                        bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+                        currentIndex++;
+                        break;
+                    case 3:
+                        while (Character.isDigit((char) data[currentIndex])) {
+                            temp += (char) data[currentIndex++];
+                        }
+
+                        if ((!Character.isDigit((char) data[currentIndex]) || (char) data[currentIndex] == '\n') && temp != "") {
+                            if (currentColor == 0) {
+                                red = Integer.parseInt(temp);
+                                red *= 255;
+                                red /= maks_color;
+                                currentColor = (currentColor + 1) % 3;
+                            } else if (currentColor == 1) {
+                                green = Integer.parseInt(temp);
+                                green *= 255;
+                                green /= maks_color;
+                                currentColor = (currentColor + 1) % 3;
+                            } else if (currentColor == 2) {
+                                blue = Integer.parseInt(temp);
+                                blue *= 255;
+                                blue /= maks_color;
+                                currentColor = (currentColor + 1) % 3;
+
+                                if (red > maks_color || green > maks_color || blue > maks_color) {
+                                    JOptionPane.showMessageDialog(null, "Something is wrong with the file... " +
+                                            "the colors exceed the maximum values :o");
+                                    return null;
+                                }
+
+                                bufferedImage.setRGB(col, row, toRGB(red, green, blue));
+                                if (col < width - 1)  ++col;
+                                else col = 0;
+
+                                if (row < height - 1)  ++row;
+                                else row = 0;
+                                if (currentIndex >= data.length - 1) loadedParameters++;
+                            }
+
+                            temp = "";
+                            continue;
+                        }
+
+                        currentIndex++;
+                        break;
                 }
             }
+
+//            for (int i = 0; i < height; i++) {
+//                for (int j = 0; j < width; j++) {
+//
+//                    red = in.nextInt();
+//                    red *= 255;
+//                    red /= maks_color;
+//
+//                    green = in.nextInt();
+//                    green *= 255;
+//                    green /= maks_color;
+//
+//                    blue = in.nextInt();
+//                    blue *= 255;
+//                    blue /= maks_color;
+//
+//                    if (red > maks_color || green > maks_color || blue > maks_color) {
+//                        JOptionPane.showMessageDialog(null, "Something is wrong with the file... " +
+//                                "the colors exceed the maximum values :o");
+//                        return null;
+//                    }
+//                    bufferedImage.setRGB(j, i, toRGB(red, green, blue));
+//                }
+//            }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
@@ -384,7 +405,77 @@ public class MainWindow extends JFrame{
     }
 
     private static BufferedImage p6(byte[] data, int start) {
-        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        BufferedImage bufferedImage;
+        String temp = "";
+        boolean isComment = false;
+        int loadedParameters = 0;
+        String currentComment = "";
+
+        while (loadedParameters < 3) {
+            if ((char) data[start] == '#') {
+                isComment = true;
+                start++;
+                continue;
+            }
+
+            if (isComment && (char) data[start] != '\n') {
+                currentComment += (char) data[start++];
+                continue;
+            } else if (isComment && (char) data[start] == '\n') {
+                start++;
+//                        comments.add(currentComment);
+                currentComment = "";
+                isComment = false;
+                continue;
+            }
+
+            switch (loadedParameters) {
+                case 0:
+                    while (Character.isDigit((char) data[start])) {
+                        temp += (char) data[start++];
+                    }
+
+                    if ((!Character.isDigit((char) data[start]) || (char) data[start] == '\n') && temp != "") {
+                        width = Integer.parseInt(temp);
+                        temp = "";
+                        loadedParameters++;
+                        continue;
+                    }
+
+                    start++;
+                    break;
+                case 1:
+                    while (Character.isDigit((char) data[start])) {
+                        temp += (char) data[start++];
+                    }
+
+                    if ((!Character.isDigit((char) data[start]) || (char) data[start] == '\n') && temp != "") {
+                        height = Integer.parseInt(temp);
+                        temp = "";
+                        loadedParameters++;
+                        continue;
+                    }
+
+                    start++;
+                    break;
+                case 2:
+                    while (Character.isDigit((char) data[start])) {
+                        temp += (char) data[start++];
+                    }
+
+                    if ((!Character.isDigit((char) data[start]) || (char) data[start] == '\n') && temp != "") {
+                        maks_color = Integer.parseInt(temp);
+                        temp = "";
+                        loadedParameters++;
+                        continue;
+                    }
+
+                    start++;
+                    break;
+            }
+        }
+
+        bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         int red, green, blue;
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
@@ -421,6 +512,7 @@ public class MainWindow extends JFrame{
             if (comment != null) {
                 pw.write(comment + "\n");
             }
+
             pw.write(img.getWidth() + " ");
             // sprawdzenie komentarza i dodanie go
             pw.write(img.getHeight() + "\n");
@@ -441,7 +533,6 @@ public class MainWindow extends JFrame{
             Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(null, "Error while writing to file in ppm p3 format :(");
         }
-
     }
 
     private static void saveAsP6(BufferedImage img, File f) {
@@ -488,5 +579,18 @@ public class MainWindow extends JFrame{
 
     public static int getBlue(int rgb) {
         return (int) (rgb) & 0xff;
+    }
+
+    public static String readNotCommentedLine(Scanner scanner) {
+        String readLine;
+        try {
+            do {
+                readLine = scanner.nextLine();
+            } while (readLine.startsWith("#"));
+        } catch (NoSuchElementException e) {
+            return null;
+        }
+
+        return readLine;
     }
 }
