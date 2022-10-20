@@ -1,6 +1,7 @@
 package project_2_graphic;
 
 import project_2_graphic.color_manager.ColorManager;
+import project_2_graphic.color_manager.CubeFrame;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -72,7 +73,7 @@ public class MainWindow extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             dispose();
-            FileLoaderAndWriter o = new FileLoaderAndWriter();
+            CubeFrame o = new CubeFrame();
             o.setVisible(true);
         }
     }

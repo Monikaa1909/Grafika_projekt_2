@@ -1,7 +1,7 @@
 package project_2_graphic.color_manager;
 
 
-import java.awt.Color;
+import java.awt.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -12,11 +12,8 @@ public class ColorManager extends javax.swing.JFrame implements ChangeListener {
     }
 
     private void initComponents() {
-
         jPanel3 = new javax.swing.JPanel();
-        jPanel4 = new Cube();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanel2 = new javax.swing.JPanel();
+        Container container = getContentPane();
         jPanel1 = new javax.swing.JPanel();
         yellow = new CMYKSlider();
         blue = new RGBSlider();
@@ -27,6 +24,7 @@ public class ColorManager extends javax.swing.JFrame implements ChangeListener {
         black = new CMYKSlider();
         green = new RGBSlider();
         red = new RGBSlider();
+
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
@@ -34,6 +32,7 @@ public class ColorManager extends javax.swing.JFrame implements ChangeListener {
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
+
         CMYKbox = new javax.swing.JRadioButton();
         RGBbox = new javax.swing.JRadioButton();
         blackText = new javax.swing.JTextField();
@@ -44,44 +43,18 @@ public class ColorManager extends javax.swing.JFrame implements ChangeListener {
         greenText = new javax.swing.JTextField();
         blueText = new javax.swing.JTextField();
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel3Layout.setVerticalGroup(
-                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 100, Short.MAX_VALUE)
-        );
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-                jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 513, Short.MAX_VALUE)
-        );
-        jPanel4Layout.setVerticalGroup(
-                jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 347, Short.MAX_VALUE)
-        );
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-
-        jTabbedPane1.addTab("Sześcian", jPanel2);
-
-
+//        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+//        jPanel3.setLayout(jPanel3Layout);
+//        jPanel3Layout.setHorizontalGroup(
+//                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+//                        .addGap(0, 100, Short.MAX_VALUE)
+//        );
+//        jPanel3Layout.setVerticalGroup(
+//                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+//                        .addGap(0, 100, Short.MAX_VALUE)
+//        );
+//
+//        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         RGBpanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -283,19 +256,7 @@ public class ColorManager extends javax.swing.JFrame implements ChangeListener {
                                 .addContainerGap())
         );
 
-        jTabbedPane1.addTab("Converter", jPanel1);
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.Alignment.TRAILING)
-        );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.Alignment.TRAILING)
-        );
-
+        container.add(jPanel1);
         pack();
     }
 
@@ -321,17 +282,14 @@ public class ColorManager extends javax.swing.JFrame implements ChangeListener {
 
     @Override
     public void stateChanged(ChangeEvent e) {
-
         if ("RGBSlider".equals(e.getSource().getClass().getSimpleName())) {
             rgbToCmyk(red.getValue(), green.getValue(), blue.getValue());
 
         } else if ("CMYKSlider".equals(e.getSource().getClass().getSimpleName())) {
             cmykToRgb(cyan.getValue(), magenta.getValue(), yellow.getValue(), black.getValue());
         }
-
     }
 
-    //
     public void rgbToCmyk(int red, int green, int blue) {
         float b = Math.min(Math.min(255 - red, 255 - green), 255 - blue);
 
@@ -414,13 +372,6 @@ public class ColorManager extends javax.swing.JFrame implements ChangeListener {
         }
     }
 
-
-    public static void main(String args[]) {
-
-        new ColorManager().setVisible(true);
-
-    }
-
     private javax.swing.JRadioButton CMYKbox;
     private javax.swing.JRadioButton RGBbox;
     private Panel RGBpanel;
@@ -437,8 +388,6 @@ public class ColorManager extends javax.swing.JFrame implements ChangeListener {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextField magentaText;
     private javax.swing.JTextField redText;
@@ -449,6 +398,6 @@ public class ColorManager extends javax.swing.JFrame implements ChangeListener {
     private CMYKSlider black;
     private CMYKSlider yellow;
     private CMYKSlider magenta;
+    private javax.swing.JPanel jPanel3;
     private CMYKSlider cyan;
-    private Cube jPanel4;
 }
