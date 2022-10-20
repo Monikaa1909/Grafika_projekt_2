@@ -1,5 +1,7 @@
 package project_2_graphic;
 
+import project_2_graphic.color_manager.ColorManager;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,7 +48,6 @@ public class MainWindow extends JFrame {
         setLocationRelativeTo(null);
 
         add(buttons, new GridBagConstraints());
-
     }
 
     private class ReadAndLoadFileListener implements ActionListener {
@@ -62,7 +63,7 @@ public class MainWindow extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             dispose();
-            FileLoaderAndWriter o = new FileLoaderAndWriter();
+            ColorManager o = new ColorManager();
             o.setVisible(true);
         }
     }
