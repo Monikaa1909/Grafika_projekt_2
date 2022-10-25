@@ -1,7 +1,12 @@
 package project_2_graphic.color_manager;
 
+import project_2_graphic.FileLoaderAndWriter;
+import project_2_graphic.MainWindow;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class CubeFrame extends javax.swing.JFrame {
 
@@ -18,6 +23,9 @@ public class CubeFrame extends javax.swing.JFrame {
         cube = new Cube();
         mainPanel = new javax.swing.JPanel();
         Container contentPane = getContentPane();
+        JButton backButton = new JButton("Back");
+        backButton.setVisible(true);
+        backButton.addActionListener(new BackListener());
 
         javax.swing.GroupLayout cubeLayout = new javax.swing.GroupLayout(cube);
         cube.setLayout(cubeLayout);
@@ -34,13 +42,25 @@ public class CubeFrame extends javax.swing.JFrame {
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
                 mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(backButton)
                         .addComponent(cube, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         mainPanelLayout.setVerticalGroup(
                 mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(backButton)
                         .addComponent(cube, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         contentPane.add(mainPanel);
     }
+
+    private class BackListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            dispose();
+            MainWindow o = new MainWindow();
+            o.setVisible(true);
+        }
+    }
+
 }

@@ -1,7 +1,12 @@
 package project_2_graphic.color_manager;
 
 
+import project_2_graphic.MainWindow;
+
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -15,6 +20,9 @@ public class ColorManager extends javax.swing.JFrame implements ChangeListener {
         jPanel3 = new javax.swing.JPanel();
         Container container = getContentPane();
         jPanel1 = new javax.swing.JPanel();
+        JButton backButton = new JButton("Back");
+        backButton.setVisible(true);
+        backButton.addActionListener(new BackListener());
         yellow = new CMYKSlider();
         blue = new RGBSlider();
         jLabel2 = new javax.swing.JLabel();
@@ -148,7 +156,8 @@ public class ColorManager extends javax.swing.JFrame implements ChangeListener {
                                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                                 .addComponent(jLabel4)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(green, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addComponent(green, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                )
                                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                                 .addComponent(jLabel5)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -201,6 +210,7 @@ public class ColorManager extends javax.swing.JFrame implements ChangeListener {
                         .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(153, 153, 153)
                                 .addComponent(RGBpanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(backButton)
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -253,11 +263,21 @@ public class ColorManager extends javax.swing.JFrame implements ChangeListener {
                                         .addComponent(jLabel2)
                                         .addComponent(CMYKbox)
                                         .addComponent(RGBbox))
+                                        .addComponent(backButton)
                                 .addContainerGap())
         );
 
         container.add(jPanel1);
         pack();
+    }
+
+    private class BackListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            dispose();
+            MainWindow o = new MainWindow();
+            o.setVisible(true);
+        }
     }
 
     private void CMYKboxActionPerformed(java.awt.event.ActionEvent evt) {
