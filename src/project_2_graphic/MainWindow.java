@@ -2,6 +2,7 @@ package project_2_graphic;
 
 import project_2_graphic.color_manager.ColorManager;
 import project_2_graphic.color_manager.CubeFrame;
+import project_2_graphic.point_transformations.PointTransformation;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -35,14 +36,17 @@ public class MainWindow extends JFrame {
         JButton convertColorsButton = new JButton("Convert colors");
         JButton drawRGBCubeButton = new JButton("Draw a RGB cube");
         JButton drawHSVConeButton = new JButton("Draw a HSV cone");
+        JButton pointTransformation = new JButton("Point transformations:v");
         readAndWriteFileButton.addActionListener(new ReadAndLoadFileListener());
         convertColorsButton.addActionListener(new ConvertColorsListener());
         drawRGBCubeButton.addActionListener(new DrawRGBCubeListener());
         drawHSVConeButton.addActionListener(new DrawHSVConeListener());
+        pointTransformation.addActionListener(new PointTransformationListener());
         buttons.add(readAndWriteFileButton);
         buttons.add(convertColorsButton);
         buttons.add(drawRGBCubeButton);
         buttons.add(drawHSVConeButton);
+        buttons.add(pointTransformation);
 
         setSize(750, 700);
         setDefaultCloseOperation(MainWindow.EXIT_ON_CLOSE);
@@ -56,6 +60,15 @@ public class MainWindow extends JFrame {
         public void actionPerformed(ActionEvent e) {
             dispose();
             FileLoaderAndWriter o = new FileLoaderAndWriter();
+            o.setVisible(true);
+        }
+    }
+
+    private class PointTransformationListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            dispose();
+            PointTransformation o = new PointTransformation();
             o.setVisible(true);
         }
     }
