@@ -37,6 +37,7 @@ public class PointTransformation extends javax.swing.JFrame implements ChangeLis
         jLabel8 = new javax.swing.JLabel();
         odcienSzarosci1 = new javax.swing.JToggleButton();
         odcienSzarosci2 = new javax.swing.JButton();
+        resetujObraz = new javax.swing.JButton();
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         jasnosc = new JasnoscSlider();
@@ -112,6 +113,13 @@ public class PointTransformation extends javax.swing.JFrame implements ChangeLis
         odcienSzarosci2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 odcienSzarosci2ActionPerformed(evt);
+            }
+        });
+
+        resetujObraz.setText("Resetuj obrazek");
+        resetujObraz.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetujObrazActionPerformed(evt);
             }
         });
 
@@ -208,6 +216,7 @@ public class PointTransformation extends javax.swing.JFrame implements ChangeLis
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                 .addComponent(jasnosc, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                 .addComponent(odcienSzarosci2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(resetujObraz, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                 .addComponent(odcienSzarosci1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                         .addGap(18, 18, 18)
                         .addComponent(panel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -262,7 +271,9 @@ public class PointTransformation extends javax.swing.JFrame implements ChangeLis
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                         .addComponent(odcienSzarosci1)
                                         .addGap(8, 8, 8)
-                                        .addComponent(odcienSzarosci2)))
+                                        .addComponent(odcienSzarosci2)
+                                        .addGap(8, 8, 8)
+                                        .addComponent(resetujObraz)))
                         .addGap(0, 12, Short.MAX_VALUE))
         );
 
@@ -275,6 +286,7 @@ public class PointTransformation extends javax.swing.JFrame implements ChangeLis
         jasnosc.addChangeListener(this);
         kontrast.addChangeListener(this);
         pack();
+
     }
 
     private void openButtonActionPerformed(java.awt.event.ActionEvent evt) throws IOException {
@@ -417,6 +429,7 @@ public class PointTransformation extends javax.swing.JFrame implements ChangeLis
     }
 
     private void odcienSzarosci2ActionPerformed(java.awt.event.ActionEvent evt) {
+
         int w = tablicaZdjecia.getWidth();
         int h = tablicaZdjecia.getHeight();
 
@@ -453,8 +466,13 @@ public class PointTransformation extends javax.swing.JFrame implements ChangeLis
 
             panel.setImg(pomocnicze);
     }
+    private void resetujObrazActionPerformed(java.awt.event.ActionEvent evt) {
+
+        panel.setImg(tablicaZdjecia);
+    }
 
     public void dodawanieOdejmowanie() {
+
         int w = tablicaZdjecia.getWidth();
         int h = tablicaZdjecia.getHeight();
 
@@ -464,15 +482,14 @@ public class PointTransformation extends javax.swing.JFrame implements ChangeLis
 
         BufferedImage pomocnicze = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 
-        if (dodawanieBlue.getValue() != poprzedniDodanyB) {
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+                Color c = new Color(dataBuffInt[index]);
+                int R = c.getRed();
+                int B = c.getBlue();
+                int G = c.getGreen();
 
-            for (int i = 0; i < h; i++) {
-                for (int j = 0; j < w; j++) {
-                    Color c = new Color(dataBuffInt[index]);
-                    int R = c.getRed();
-                    int B = c.getBlue();
-                    int G = c.getGreen();
-                    // System.out.println("R:" +R+" G:"+G+" B:"+B +" dodawanie teraz="+ dodawanieRed.getValue());;
+                if (dodawanieBlue.getValue() != 0) {
                     B = B + dodawanieBlue.getValue();
                     if (B > 255) {
                         B = 255;
@@ -480,57 +497,9 @@ public class PointTransformation extends javax.swing.JFrame implements ChangeLis
                     if (B < 0) {
                         B = 0;
                     }
-
-                    // System.out.println("R"+R + " stare R"+ c.getRed());
-                    Color nowy = new Color(R, G, B);
-                    int rgb = nowy.getRGB();
-                    pomocnicze.setRGB(j, i, rgb);
-                    index++;
                 }
-            }
-            poprzedniDodanyB = dodawanieBlue.getValue();
-            panel.setImg(pomocnicze);
-            dodawanieGreen.setValue(0);
-            dodawanieRed.setValue(0);
 
-        }
-        if (dodawanieGreen.getValue() != poprzedniDodanyG) {
-
-            for (int i = 0; i < h; i++) {
-                for (int j = 0; j < w; j++) {
-                    Color c = new Color(dataBuffInt[index]);
-                    int R = c.getRed();
-                    int B = c.getBlue();
-                    int G = c.getGreen();
-
-                    G = G + dodawanieGreen.getValue();
-                    if (G > 255) {
-                        G = 255;
-                    }
-                    if (G < 0) {
-                        G = 0;
-                    }
-
-                    Color nowy = new Color(R, G, B);
-                    int rgb = nowy.getRGB();
-                    pomocnicze.setRGB(j, i, rgb);
-                    index++;
-                }
-            }
-            poprzedniDodanyG = dodawanieGreen.getValue();
-            panel.setImg(pomocnicze);
-            dodawanieBlue.setValue(0);
-            dodawanieRed.setValue(0);
-        }
-        if (dodawanieRed.getValue() != poprzedniDodanyR) {
-
-            for (int i = 0; i < h; i++) {
-                for (int j = 0; j < w; j++) {
-                    Color c = new Color(dataBuffInt[index]);
-                    int R = c.getRed();
-                    int B = c.getBlue();
-                    int G = c.getGreen();
-                    //System.out.println("R:" +R+" G:"+G+" B:"+B +" dodawanie teraz="+ dodawanieRed.getValue());
+                if (dodawanieRed.getValue() != 0) {
                     R = R + dodawanieRed.getValue();
                     if (R > 255) {
                         R = 255;
@@ -538,22 +507,31 @@ public class PointTransformation extends javax.swing.JFrame implements ChangeLis
                     if (R < 0) {
                         R = 0;
                     }
-                    Color nowy = new Color(R, G, B);
-                    int rgb = nowy.getRGB();
-                    pomocnicze.setRGB(j, i, rgb);
-                    index++;
                 }
+
+                if (dodawanieGreen.getValue() != 0) {
+                    G = G + dodawanieGreen.getValue();
+                    if (G > 255) {
+                        G = 255;
+                    }
+                    if (G < 0) {
+                        G = 0;
+                    }
+                }
+
+                Color nowy = new Color(R, G, B);
+                int rgb = nowy.getRGB();
+                pomocnicze.setRGB(j, i, rgb);
+                index++;
             }
-            poprzedniDodanyR = dodawanieRed.getValue();
-            panel.setImg(pomocnicze);
-            dodawanieBlue.setValue(0);
-            dodawanieGreen.setValue(0);
-
         }
-
+        index = 0;
+        panel.setImg(pomocnicze);
     }
        
-    public void mnozenieDzielenie(){
+    public void mnozenieDzielenie() {
+
+
         int w = tablicaZdjecia.getWidth();
         int h = tablicaZdjecia.getHeight();
 
@@ -562,14 +540,15 @@ public class PointTransformation extends javax.swing.JFrame implements ChangeLis
         int index = 0;
 
         BufferedImage pomocnicze = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-        if (mnozenieRed.getValue() != poprzedniMnozonyR) {
 
-            for (int i = 0; i < h; i++) {
-                for (int j = 0; j < w; j++) {
-                    Color c = new Color(dataBuffInt[index]);
-                    float R = c.getRed();
-                    float B = c.getBlue();
-                    float G = c.getGreen();
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+                Color c = new Color(dataBuffInt[index]);
+                float R = c.getRed();
+                float B = c.getBlue();
+                float G = c.getGreen();
+
+                if (mnozenieRed.getValue() != 0) {
                     float tmp =(float) mnozenieRed.getValue();
                     tmp = tmp /100;
                     R =R * tmp;
@@ -579,86 +558,41 @@ public class PointTransformation extends javax.swing.JFrame implements ChangeLis
                     if (R < 0) {
                         R = 0;
                     }
-                    Color nowy = new Color((int)R,(int) G,(int) B);
-                    int rgb = nowy.getRGB();
-                    pomocnicze.setRGB(j, i, rgb);
-                    index++;
                 }
-            }
-            poprzedniMnozonyR = mnozenieRed.getValue();
-            panel.setImg(pomocnicze);
-            mnozenieGreen.setValue(200);
-            mnozenieBlue.setValue(200);
-        }
-        
-        if (mnozenieGreen.getValue() != poprzedniMnozonyG) {
-
-            for (int i = 0; i < h; i++) {
-                for (int j = 0; j < w; j++) {
-                    Color c = new Color(dataBuffInt[index]);
-                    float R = c.getRed();
-                    float B = c.getBlue();
-                    float G = c.getGreen();
-                    // System.out.println("R:" +R+" G:"+G+" B:"+B +" dodawanie teraz="+ dodawanieRed.getValue());;
-                    float tmp =(float) mnozenieGreen.getValue();
-                    tmp = tmp /100;
-                    G =G * tmp;
+                if (mnozenieGreen.getValue() != 0) {
+                    float tmp2 =(float) mnozenieGreen.getValue();
+                    tmp2 = tmp2 /100;
+                    G =G * tmp2;
                     if (G > 255) {
                         G = 255;
                     }
                     if (G < 0) {
                         G = 0;
                     }
-
-                    // System.out.println("R"+R + " stare R"+ c.getRed());
-                    Color nowy = new Color((int)R,(int) G,(int) B);
-                    int rgb = nowy.getRGB();
-                    pomocnicze.setRGB(j, i, rgb);
-                    index++;
                 }
-            }
-            poprzedniMnozonyG = mnozenieGreen.getValue();
-            panel.setImg(pomocnicze);
-            mnozenieRed.setValue(200);
-            mnozenieBlue.setValue(200);
-        }
-        
-        
-        if (mnozenieBlue.getValue() != poprzedniMnozonyB) {
-
-            for (int i = 0; i < h; i++) {
-                for (int j = 0; j < w; j++) {
-                    Color c = new Color(dataBuffInt[index]);
-                    float R = c.getRed();
-                    float B = c.getBlue();
-                    float G = c.getGreen();
-                    // System.out.println("R:" +R+" G:"+G+" B:"+B +" dodawanie teraz="+ dodawanieRed.getValue());;
-                    float tmp =(float) mnozenieBlue.getValue();
-                    tmp = tmp /100;
-                    B = B * tmp;
+                if (mnozenieBlue.getValue() != 0) {
+                    float tmp3 =(float) mnozenieBlue.getValue();
+                    tmp3 = tmp3 /100;
+                    B = B * tmp3;
                     if (B > 255) {
                         B = 255;
                     }
                     if (B < 0) {
                         B = 0;
                     }
-
-                    // System.out.println("R"+R + " stare R"+ c.getRed());
-                    Color nowy = new Color((int) R,(int) G,(int) B);
-                    int rgb = nowy.getRGB();
-                    pomocnicze.setRGB(j, i, rgb);
-                    index++;
                 }
+
+                Color nowy = new Color((int)R,(int) G,(int) B);
+                int rgb = nowy.getRGB();
+                pomocnicze.setRGB(j, i, rgb);
+                index++;
             }
-            poprzedniMnozonyB = mnozenieBlue.getValue();
-            panel.setImg(pomocnicze);
-            mnozenieRed.setValue(200);
-            mnozenieGreen.setValue(200);
         }
-        
+        panel.setImg(pomocnicze);
     }
     
     public void jasnosc(){
+
         int w = tablicaZdjecia.getWidth();
         int h = tablicaZdjecia.getHeight();
 
@@ -708,7 +642,8 @@ public class PointTransformation extends javax.swing.JFrame implements ChangeLis
     }
     
     public void kontrast(){
-    int w = tablicaZdjecia.getWidth();
+
+        int w = tablicaZdjecia.getWidth();
         int h = tablicaZdjecia.getHeight();
 
         int[] dataBuffInt = tablicaZdjecia.getRGB(0, 0, w, h, null, 0, w);
@@ -824,6 +759,7 @@ public class PointTransformation extends javax.swing.JFrame implements ChangeLis
     private MnozenieSlider mnozenieRed;
     private javax.swing.JToggleButton odcienSzarosci1;
     private javax.swing.JButton odcienSzarosci2;
+    private javax.swing.JButton resetujObraz;
     private javax.swing.JMenuItem openButton;
     private Panel panel;
     private int ileWierszy;
