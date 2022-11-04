@@ -9,10 +9,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-/**
- *
- * @author Bartek
- */
 public class Panel extends JPanel{
     
     BufferedImage img = null;

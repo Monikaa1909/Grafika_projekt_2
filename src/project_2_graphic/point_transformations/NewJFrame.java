@@ -5,10 +5,6 @@
  */
 package project_2_graphic.point_transformations;
 
-/**
- *
- * @author Bartek
- */
 public class NewJFrame extends javax.swing.JFrame {
 
     /**
