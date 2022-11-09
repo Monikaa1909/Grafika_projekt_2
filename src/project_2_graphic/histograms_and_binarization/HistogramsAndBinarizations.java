@@ -14,9 +14,11 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class HistogramsAndBinarizations extends javax.swing.JFrame implements ChangeListener {
 
@@ -74,6 +76,13 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
         histogramExtensionbutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 extendHistogramActionPerformed(evt);
+            }
+        });
+
+        percentBlackSelectionButton.setText("Selekcja procentowa czarnego");
+        percentBlackSelectionButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                blackPercentageSelectionMethodActionPerformed(evt);
             }
         });
 
@@ -406,6 +415,52 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
         return manuallyBinarizedImg;
     }
 
+    public BufferedImage blackPercentageSelectionMethod(BufferedImage imageArray, double percentage) {
+        int w = imageArray.getWidth();
+        int h = imageArray.getHeight();
+        int amountOfPixels = w * h;
+
+        int[] pixelTable = new int[amountOfPixels];
+//        HashMap<Integer, Integer> pixelTable2 = new HashMap<>();
+        for (int i = 0; i < w; i++) {
+            for (int j = 0; j < h; j++) {
+                int val = imageArray.getRGB(i, j);
+                int r = (0x00ff0000 & val) >> 16;
+                int g = (0x0000ff00 & val) >> 8;
+                int b = (0x000000ff & val);
+                int sum = (r + g + b);
+                if (sum == 0) sum = 1;
+                pixelTable[sum - 1] += 1;
+            }
+        }
+
+        int[] LUT = new int[768];
+        double limes = ((double) percentage / 100) * ((double) amountOfPixels);
+        int nextSum = 0;
+        for (int i = 0; i < 768; ++i) {
+            nextSum = nextSum + pixelTable[i];
+            if (nextSum < limes) {
+                LUT[i] = 0;
+            } else {
+                LUT[i] = 1;
+            }
+        }
+        BufferedImage blackPercentageMethodImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        for (int i = 0; i < w; i++) {
+            for (int j = 0; j < h; j++) {
+                int val = imageArray.getRGB(i, j);
+                int r = (0x00ff0000 & val) >> 16;
+                int g = (0x0000ff00 & val) >> 8;
+                int b = (0x000000ff & val);
+                int sum = (r + g + b);
+                if (LUT[sum] == 0) blackPercentageMethodImage.setRGB(i, j, Color.BLACK.getRGB());
+                else blackPercentageMethodImage.setRGB(i, j, Color.WHITE.getRGB());
+            }
+        }
+
+        return blackPercentageMethodImage;
+    }
+
     private static int[] strechLookupTable(int a, int b, int maxI){
         int[] lookup = new int[maxI];
         for(int i=0; i<lookup.length; i++){
@@ -531,6 +586,11 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
 
     private void manualBinarizationActionPerformed(java.awt.event.ActionEvent evt) {
         BufferedImage processedImage = manualImageBinarization(imageArray, 200);
+        panel.setImg(processedImage);
+    }
+
+    private void blackPercentageSelectionMethodActionPerformed(java.awt.event.ActionEvent evt) {
+        BufferedImage processedImage = blackPercentageSelectionMethod(imageArray, 60);
         panel.setImg(processedImage);
     }
 
