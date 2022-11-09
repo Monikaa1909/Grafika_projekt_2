@@ -108,6 +108,7 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
                                                         .addComponent(histogramExtensionbutton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(resetImage, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(histogramEqualizationButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(manualBinarizationButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 
                                                         .addComponent(backButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                                 .addGap(18, 18, 18)
@@ -129,6 +130,8 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
                                                 .addComponent(histogramExtensionbutton)
                                                 .addGap(8, 8, 8)
                                                 .addComponent(resetImage)
+                                                .addGap(8, 8, 8)
+                                                .addComponent(manualBinarizationButton)
                                                 .addGap(8, 8, 8)
                                                 .addComponent(backButton)))
                                 .addGap(0, 12, Short.MAX_VALUE))
