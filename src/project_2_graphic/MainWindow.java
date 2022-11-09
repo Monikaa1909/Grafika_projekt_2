@@ -2,6 +2,7 @@ package project_2_graphic;
 
 import project_2_graphic.color_manager.ColorManager;
 import project_2_graphic.color_manager.CubeFrame;
+import project_2_graphic.histogram_strecher.HistogramStrecher;
 import project_2_graphic.point_transformations.PointTransformation;
 
 import java.awt.*;
@@ -37,22 +38,34 @@ public class MainWindow extends JFrame {
         JButton drawRGBCubeButton = new JButton("Draw a RGB cube");
         JButton drawHSVConeButton = new JButton("Draw a HSV cone");
         JButton pointTransformation = new JButton("Point transformations:v");
+        JButton stretchHistogramButton = new JButton("Stretch the histogram");
         readAndWriteFileButton.addActionListener(new ReadAndLoadFileListener());
         convertColorsButton.addActionListener(new ConvertColorsListener());
         drawRGBCubeButton.addActionListener(new DrawRGBCubeListener());
         drawHSVConeButton.addActionListener(new DrawHSVConeListener());
         pointTransformation.addActionListener(new PointTransformationListener());
+        stretchHistogramButton.addActionListener(new stretchHistogramListener());
         buttons.add(readAndWriteFileButton);
         buttons.add(convertColorsButton);
         buttons.add(drawRGBCubeButton);
         buttons.add(drawHSVConeButton);
         buttons.add(pointTransformation);
+        buttons.add(stretchHistogramButton);
 
         setSize(750, 700);
         setDefaultCloseOperation(MainWindow.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         add(buttons, new GridBagConstraints());
+    }
+
+    private class stretchHistogramListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            dispose();
+            HistogramStrecher o = new HistogramStrecher();
+            o.setVisible(true);
+        }
     }
 
     private class ReadAndLoadFileListener implements ActionListener {

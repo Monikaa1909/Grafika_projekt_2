@@ -134,9 +134,11 @@ public class PointTransformation extends javax.swing.JFrame implements ChangeLis
 
         jLabel10.setText("Jasność");
 
-        brightness.setMaximum(255);
-        brightness.setMinimum(-255);
-        brightness.setValue(0);
+//        brightness.setMaximum(255);
+//        brightness.setMinimum(-255);
+        brightness.setMaximum(128);
+        brightness.setMinimum(0);
+        brightness.setValue(2);
 
         jLabel11.setText("Kontrast");
 
@@ -615,9 +617,15 @@ public class PointTransformation extends javax.swing.JFrame implements ChangeLis
                     int R = c.getRed();
                     int B = c.getBlue();
                     int G = c.getGreen();
-                    R = R + brightness.getValue();
-                    G = G + brightness.getValue();
-                    B = B + brightness.getValue();
+
+                    double b = brightness.getValue() / 128d;
+                    R = (int) (b * (R * R));
+                    B = (int) (b * (B * B));
+                    G = (int) (b * (G * G));
+
+//                    R = R + brightness.getValue();
+//                    G = G + brightness.getValue();
+//                    B = B + brightness.getValue();
                     if(R > 255){
                         R = 255;
                     }

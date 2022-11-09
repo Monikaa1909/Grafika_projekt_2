@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package project_2_graphic.point_transformations;
+package project_2_graphic.histogram_strecher;
 
 import javax.swing.*;
 import java.awt.*;
