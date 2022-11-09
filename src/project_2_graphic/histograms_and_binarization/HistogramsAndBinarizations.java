@@ -33,6 +33,17 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
         histogramEqualizationButton = new javax.swing.JToggleButton();
         histogramExtensionbutton = new javax.swing.JButton();
         manualBinarizationButton = new javax.swing.JButton();
+        percentBlackSelectionButton = new javax.swing.JButton();
+        meanIterativeSelectionButton = new javax.swing.JButton();
+        entropySelectionButton = new javax.swing.JButton();
+        minimumErrorButton = new javax.swing.JButton();
+        fuzzyMinimumErrorButton = new javax.swing.JButton();
+
+        manualBinarizationValueSlider = new javax.swing.JSlider();
+        manualBinarizationValueSlider.setMaximum(255);
+        manualBinarizationValueSlider.setMinimum(0);
+        manualBinarizationValueSlider.setValue(200);
+
         resetImage = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
@@ -349,11 +360,32 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
         return histogramST;
     }
 
-    public BufferedImage manualImageBinarization(BufferedImage original) {
+    public BufferedImage manualImageBinarization(BufferedImage original, int threshold) {
 
-        BufferedImage histogramST = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
+        int h = original.getHeight();
+        int w = original.getWidth();
 
-        return histogramST;
+
+        BufferedImage manuallyBinarizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        for (int i = 0; i < w; i++) {
+            for (int j = 0; j < h; j++) {
+
+
+                //Get RGB Value
+                int val = original.getRGB(i, j);
+                int r = (0x00ff0000 & val) >> 16;
+                int g = (0x0000ff00 & val) >> 8;
+                int b = (0x000000ff & val);
+                int sum = (r + g + b);
+                if (sum >= threshold) {
+                    manuallyBinarizedImg.setRGB(i, j, Color.WHITE.getRGB());
+                } else {
+                    manuallyBinarizedImg.setRGB(i, j, 0);
+                }
+            }
+        }
+
+        return manuallyBinarizedImg;
     }
 
     private static int[] strechLookupTable(int a, int b, int maxI){
@@ -480,7 +512,7 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
     }
 
     private void manualBinarizationActionPerformed(java.awt.event.ActionEvent evt) {
-        BufferedImage processedImage = manualImageBinarization(imageArray);
+        BufferedImage processedImage = manualImageBinarization(imageArray, 200);
         panel.setImg(processedImage);
     }
 
@@ -508,6 +540,15 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
     private javax.swing.JButton manualBinarizationButton;
     private javax.swing.JButton resetImage;
     private javax.swing.JMenuItem openButton;
+
+    // TODO: dodać do layoutu
+    private javax.swing.JSlider manualBinarizationValueSlider;
+    private javax.swing.JButton percentBlackSelectionButton;
+    private javax.swing.JButton meanIterativeSelectionButton;
+    private javax.swing.JButton entropySelectionButton;
+    private javax.swing.JButton minimumErrorButton;
+    private javax.swing.JButton fuzzyMinimumErrorButton;
+
     private Panel panel;
     private int amountOfRows;
     private int amountOfColumns;
