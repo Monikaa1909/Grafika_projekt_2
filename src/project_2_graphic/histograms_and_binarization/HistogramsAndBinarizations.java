@@ -442,11 +442,18 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
 
         BufferedImage manuallyBinarizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 
-        int averageR;
-        int deviation;
+        double  averageR, averageG, averageB;
+        double  deviationR, deviationG, deviationB;
+
+        double[][] TR = new double[h][w];
+        double[][] TG = new double[h][w];
+        double[][] TB = new double[h][w];
+
+        int sumR;
+        int sumG;
+        int sumB;
 
         int x, y;
-
         int red;
         int green;
         int blue;
@@ -454,9 +461,10 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
         for (int i = 0; i < w; i++) {
             for (int j = 0; j < h; j++) {
 
-                int sumR = 0;
-                int sumG = 0;
-                int sumB = 0;
+                sumR = 0;
+                sumG = 0;
+                sumB = 0;
+                int neighboursCounter = 1;
 
                 red = new Color(original.getRGB(i, j)).getRed();
                 green = new Color(original.getRGB(i, j)).getGreen();
@@ -464,7 +472,7 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
 
                 sumR = sumR + red;
                 sumG = sumG + green;
-                sumB = sumB + red;
+                sumB = sumB + blue;
 
                 x = i;
                 y = j-1;
@@ -476,7 +484,8 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
 
                     sumR = sumR + red;
                     sumG = sumG + green;
-                    sumB = sumB + red;
+                    sumB = sumB + blue;
+                    neighboursCounter += 1;
                 }
 
                 x = i;
@@ -489,7 +498,8 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
 
                     sumR = sumR + red;
                     sumG = sumG + green;
-                    sumB = sumB + red;
+                    sumB = sumB + blue;
+                    neighboursCounter += 1;
                 }
 
                 x = i+1;
@@ -502,7 +512,8 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
 
                     sumR = sumR + red;
                     sumG = sumG + green;
-                    sumB = sumB + red;
+                    sumB = sumB + blue;
+                    neighboursCounter += 1;
                 }
 
                 x = i-1;
@@ -515,7 +526,8 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
 
                     sumR = sumR + red;
                     sumG = sumG + green;
-                    sumB = sumB + red;
+                    sumB = sumB + blue;
+                    neighboursCounter += 1;
                 }
 
                 x = i-1;
@@ -528,7 +540,8 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
 
                     sumR = sumR + red;
                     sumG = sumG + green;
-                    sumB = sumB + red;
+                    sumB = sumB + blue;
+                    neighboursCounter += 1;
                 }
 
                 x = i+1;
@@ -541,7 +554,8 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
 
                     sumR = sumR + red;
                     sumG = sumG + green;
-                    sumB = sumB + red;
+                    sumB = sumB + blue;
+                    neighboursCounter += 1;
                 }
 
                 x = i-1;
@@ -554,7 +568,8 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
 
                     sumR = sumR + red;
                     sumG = sumG + green;
-                    sumB = sumB + red;
+                    sumB = sumB + blue;
+                    neighboursCounter += 1;
                 }
 
                 x = i+1;
@@ -567,29 +582,189 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
 
                     sumR = sumR + red;
                     sumG = sumG + green;
-                    sumB = sumB + red;
+                    sumB = sumB + blue;
+                    neighboursCounter += 1;
                 }
 
-                if (red < k) {
+                averageR = (double) sumR/neighboursCounter;
+                averageB = (double) sumB/neighboursCounter;
+                averageG = (double) sumG/neighboursCounter;
+
+                if (averageR < 0) {
+                    averageR = 0;
+                } else if (averageR > 255) {
+                    averageR = 255;
+                }
+
+                if (averageB < 0) {
+                    averageB = 0;
+                } else if (averageB > 255) {
+                    averageB = 255;
+                }
+
+                if (averageG < 0) {
+                    averageG = 0;
+                } else if (averageG > 255) {
+                    averageG = 255;
+                }
+
+                sumR = 0;
+                sumG = 0;
+                sumB = 0;
+
+                // -----------------------
+                red = new Color(original.getRGB(i, j)).getRed();
+                green = new Color(original.getRGB(i, j)).getGreen();
+                blue = new Color(original.getRGB(i, j)).getBlue();
+
+                sumR = sumR + (red - (int)averageR) * (red - (int)averageR);
+                sumG = sumG + (green - (int)averageG) * (green - (int)averageG);
+                sumB = sumB + (blue - (int)averageB) * (blue - (int)averageB);
+
+                x = i;
+                y = j-1;
+
+                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
+                    red = new Color(original.getRGB(x, y)).getRed();
+                    green = new Color(original.getRGB(x, y)).getGreen();
+                    blue = new Color(original.getRGB(x, y)).getBlue();
+
+                    sumR = sumR + (red - (int)averageR) * (red - (int)averageR);
+                    sumG = sumG + (green - (int)averageG) * (green - (int)averageG);
+                    sumB = sumB + (blue - (int)averageB) * (blue - (int)averageB);
+                }
+
+                x = i;
+                y = j+1;
+
+                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
+                    red = new Color(original.getRGB(x, y)).getRed();
+                    green = new Color(original.getRGB(x, y)).getGreen();
+                    blue = new Color(original.getRGB(x, y)).getBlue();
+
+                    sumR = sumR + (red - (int)averageR) * (red - (int)averageR);
+                    sumG = sumG + (green - (int)averageG) * (green - (int)averageG);
+                    sumB = sumB + (blue - (int)averageB) * (blue - (int)averageB);
+                }
+
+                x = i+1;
+                y = j+1;
+
+                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
+                    red = new Color(original.getRGB(x, y)).getRed();
+                    green = new Color(original.getRGB(x, y)).getGreen();
+                    blue = new Color(original.getRGB(x, y)).getBlue();
+
+                    sumR = sumR + (red - (int)averageR) * (red - (int)averageR);
+                    sumG = sumG + (green - (int)averageG) * (green - (int)averageG);
+                    sumB = sumB + (blue - (int)averageB) * (blue - (int)averageB);
+                }
+
+                x = i-1;
+                y = j+1;
+
+                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
+                    red = new Color(original.getRGB(x, y)).getRed();
+                    green = new Color(original.getRGB(x, y)).getGreen();
+                    blue = new Color(original.getRGB(x, y)).getBlue();
+
+                    sumR = sumR + (red - (int)averageR) * (red - (int)averageR);
+                    sumG = sumG + (green - (int)averageG) * (green - (int)averageG);
+                    sumB = sumB + (blue - (int)averageB) * (blue - (int)averageB);
+                }
+
+                x = i-1;
+                y = j-1;
+
+                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
+                    red = new Color(original.getRGB(x, y)).getRed();
+                    green = new Color(original.getRGB(x, y)).getGreen();
+                    blue = new Color(original.getRGB(x, y)).getBlue();
+
+                    sumR = sumR + (red - (int)averageR) * (red - (int)averageR);
+                    sumG = sumG + (green - (int)averageG) * (green - (int)averageG);
+                    sumB = sumG + (blue - (int)averageB) * (blue - (int)averageB);
+                }
+
+                x = i+1;
+                y = j-1;
+
+                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
+                    red = new Color(original.getRGB(x, y)).getRed();
+                    green = new Color(original.getRGB(x, y)).getGreen();
+                    blue = new Color(original.getRGB(x, y)).getBlue();
+
+                    sumR = sumR + (red - (int)averageR) * (red - (int)averageR);
+                    sumG = sumG + (green - (int)averageG) * (green - (int)averageG);
+                    sumB = sumB + (blue - (int)averageB) * (blue - (int)averageB);
+                }
+
+                x = i-1;
+                y = j;
+
+                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
+                    red = new Color(original.getRGB(x, y)).getRed();
+                    green = new Color(original.getRGB(x, y)).getGreen();
+                    blue = new Color(original.getRGB(x, y)).getBlue();
+
+                    sumR = sumR + (red - (int)averageR) * (red - (int)averageR);
+                    sumG = sumG + (green - (int)averageG) * (green - (int)averageG);
+                    sumB = sumB + (blue - (int)averageB) * (blue - (int)averageB);
+                }
+
+                x = i+1;
+                y = j;
+
+                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
+                    red = new Color(original.getRGB(x, y)).getRed();
+                    green = new Color(original.getRGB(x, y)).getGreen();
+                    blue = new Color(original.getRGB(x, y)).getBlue();
+
+                    sumR = sumR + (red - (int)averageR) * (red - (int)averageR);
+                    sumG = sumG + (green - (int)averageG) * (green - (int)averageG);
+                    sumB = sumB + (blue - (int)averageB) * (blue - (int)averageB);
+                }
+
+                deviationR = Math.sqrt(sumR/neighboursCounter);
+                deviationG = Math.sqrt(sumG/neighboursCounter);
+                deviationB = Math.sqrt(sumB/neighboursCounter);
+
+                TR[i][j] = averageR + k * deviationR;
+                TG[i][j] = averageG + k * deviationG;
+                TB[i][j] = averageB + k * deviationB;
+                // -----------------------
+            }
+        }
+
+
+        for (int i = 0; i < w; i++) {
+            for (int j = 0; j < h; j++) {
+
+                Color color = new Color(original.getRGB(i, j));
+                red = color.getRed();
+                green = color.getGreen();
+                blue = color.getBlue();
+
+                if (red < TR[i][j]) {
                     red = 0;
                 } else {
                     red = 255;
                 }
 
-                if (green < k) {
+                if (green < TG[i][j]) {
                     green = 0;
                 } else {
                     green = 255;
                 }
 
-                if (blue < k) {
+                if (blue < TB[i][j]) {
                     blue = 0;
                 } else {
                     blue = 255;
                 }
 
-//                color = new Color(red, green, blue);
-//                manuallyBinarizedImg.setRGB(i, j, color.getRGB());
+                color = new Color(red, green, blue);
+                manuallyBinarizedImg.setRGB(i, j, color.getRGB());
             }
         }
 
@@ -778,7 +953,7 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
     }
 
     private void niblackBinarizationActionPerformed(java.awt.event.ActionEvent evt) {
-        BufferedImage processedImage = niblackBinarization(imageArray, 58);
+        BufferedImage processedImage = niblackBinarization(imageArray, manualBinarizationValueSlider.getValue());
         panel.setImg(processedImage);
     }
 
