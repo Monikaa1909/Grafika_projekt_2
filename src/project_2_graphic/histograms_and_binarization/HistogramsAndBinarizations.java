@@ -404,18 +404,32 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
         for (int i = 0; i < w; i++) {
             for (int j = 0; j < h; j++) {
 
+                Color color = new Color(original.getRGB(i, j));
+                int red = color.getRed();
+                int green = color.getGreen();
+                int blue = color.getBlue();
 
-                //Get RGB Value
-                int val = original.getRGB(i, j);
-                int r = (0x00ff0000 & val) >> 16;
-                int g = (0x0000ff00 & val) >> 8;
-                int b = (0x000000ff & val);
-                int sum = (r + g + b);
-                if (sum >= threshold) {
-                    manuallyBinarizedImg.setRGB(i, j, Color.WHITE.getRGB());
+                int sum = (red + green + blue);
+                if (red < threshold) {
+                    red = 0;
                 } else {
-                    manuallyBinarizedImg.setRGB(i, j, 0);
+                    red = 255;
                 }
+
+                if (green < threshold) {
+                    green = 0;
+                } else {
+                    green = 255;
+                }
+
+                if (blue < threshold) {
+                    blue = 0;
+                } else {
+                    blue = 255;
+                }
+
+                color = new Color(red, green, blue);
+                manuallyBinarizedImg.setRGB(i, j, color.getRGB());
             }
         }
 
