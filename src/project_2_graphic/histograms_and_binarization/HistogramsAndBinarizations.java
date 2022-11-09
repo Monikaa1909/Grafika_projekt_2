@@ -35,7 +35,7 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
         manualBinarizationButton = new javax.swing.JButton();
         percentBlackSelectionButton = new javax.swing.JButton();
         meanIterativeSelectionButton = new javax.swing.JButton();
-        entropySelectionButton = new javax.swing.JButton();
+        niblackBinarizationButton = new javax.swing.JButton();
         minimumErrorButton = new javax.swing.JButton();
         fuzzyMinimumErrorButton = new javax.swing.JButton();
 
@@ -91,6 +91,13 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
             }
         });
 
+        niblackBinarizationButton.setText("Binaryzacja Nibclack");
+        niblackBinarizationButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                niblackBinarizationActionPerformed(evt);
+            }
+        });
+
         resetImage.setText("Resetuj obrazek");
         resetImage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -130,7 +137,7 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
                                                         .addComponent(manualBinarizationButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(percentBlackSelectionButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(meanIterativeSelectionButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(entropySelectionButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(niblackBinarizationButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(minimumErrorButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(fuzzyMinimumErrorButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(backButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
@@ -161,7 +168,7 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
                                                 .addGap(8, 8, 8)
                                                 .addComponent(meanIterativeSelectionButton)
                                                 .addGap(8, 8, 8)
-                                                .addComponent(entropySelectionButton)
+                                                .addComponent(niblackBinarizationButton)
                                                 .addGap(8, 8, 8)
                                                 .addComponent(minimumErrorButton)
                                                 .addGap(8, 8, 8)
@@ -427,51 +434,232 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
         return manuallyBinarizedImg;
     }
 
-    public BufferedImage percentBlackSelectionImageBinarization(BufferedImage imageArray, double percentage) {
-        int h = imageArray.getHeight();
-        int w = imageArray.getWidth();
-        int amountOfPixels = w * h;
+    public BufferedImage niblackBinarization(BufferedImage original, int k) {
 
-        int[] pixelTable = new int[amountOfPixels];
-//        HashMap<Integer, Integer> pixelTable2 = new HashMap<>();
+        int h = original.getHeight();
+        int w = original.getWidth();
+
+
+        BufferedImage manuallyBinarizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+
+        int average;
+        int deviation;
+
+        int x, y;
+
+        int red;
+        int green;
+        int blue;
+
         for (int i = 0; i < w; i++) {
             for (int j = 0; j < h; j++) {
-                int val = imageArray.getRGB(i, j);
-                int r = (0x00ff0000 & val) >> 16;
-                int g = (0x0000ff00 & val) >> 8;
-                int b = (0x000000ff & val);
-                int sum = (r + g + b);
-                if (sum == 0) sum = 1;
-                pixelTable[sum - 1] += 1;
+
+                int sumR = 0;
+                int sumG = 0;
+                int sumB = 0;
+
+                red = new Color(original.getRGB(i, j)).getRed();
+                green = new Color(original.getRGB(i, j)).getGreen();
+                blue = new Color(original.getRGB(i, j)).getBlue();
+
+                sumR = sumR + red;
+                sumG = sumG + green;
+                sumB = sumB + red;
+
+                x = i;
+                j = j-1;
+
+                if ()
+                red = new Color(original.getRGB(i, j)).getRed();
+                green = new Color(original.getRGB(i, j)).getGreen();
+                blue = new Color(original.getRGB(i, j)).getBlue();
+
+                if (red < k) {
+                    red = 0;
+                } else {
+                    red = 255;
+                }
+
+                if (green < k) {
+                    green = 0;
+                } else {
+                    green = 255;
+                }
+
+                if (blue < k) {
+                    blue = 0;
+                } else {
+                    blue = 255;
+                }
+
+                color = new Color(red, green, blue);
+                manuallyBinarizedImg.setRGB(i, j, color.getRGB());
             }
         }
 
-        int[] LUT = new int[768];
-        double limes = ((double) percentage / 100) * ((double) amountOfPixels);
-        int nextSum = 0;
-        for (int i = 0; i < 768; ++i) {
-            nextSum = nextSum + pixelTable[i];
-            if (nextSum < limes) {
-                LUT[i] = 0;
-            } else {
-                LUT[i] = 1;
-            }
-        }
+        return manuallyBinarizedImg;
+    }
 
-        BufferedImage blackPercentageMethodImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+    public BufferedImage niblackBinarization(BufferedImage original, int k) {
+
+        int h = original.getHeight();
+        int w = original.getWidth();
+
+
+        BufferedImage manuallyBinarizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+
+        int averageR;
+        int deviation;
+
+        int x, y;
+
+        int red;
+        int green;
+        int blue;
+
         for (int i = 0; i < w; i++) {
             for (int j = 0; j < h; j++) {
-                int val = imageArray.getRGB(i, j);
-                int r = (0x00ff0000 & val) >> 16;
-                int g = (0x0000ff00 & val) >> 8;
-                int b = (0x000000ff & val);
-                int sum = (r + g + b);
-                if (LUT[sum] == 0) blackPercentageMethodImage.setRGB(i, j, Color.BLACK.getRGB());
-                else blackPercentageMethodImage.setRGB(i, j, Color.WHITE.getRGB());
+
+                int sumR = 0;
+                int sumG = 0;
+                int sumB = 0;
+
+                red = new Color(original.getRGB(i, j)).getRed();
+                green = new Color(original.getRGB(i, j)).getGreen();
+                blue = new Color(original.getRGB(i, j)).getBlue();
+
+                sumR = sumR + red;
+                sumG = sumG + green;
+                sumB = sumB + red;
+
+                x = i;
+                y = j-1;
+
+                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
+                    red = new Color(original.getRGB(x, y)).getRed();
+                    green = new Color(original.getRGB(x, y)).getGreen();
+                    blue = new Color(original.getRGB(x, y)).getBlue();
+
+                    sumR = sumR + red;
+                    sumG = sumG + green;
+                    sumB = sumB + red;
+                }
+
+                x = i;
+                y = j+1;
+
+                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
+                    red = new Color(original.getRGB(x, y)).getRed();
+                    green = new Color(original.getRGB(x, y)).getGreen();
+                    blue = new Color(original.getRGB(x, y)).getBlue();
+
+                    sumR = sumR + red;
+                    sumG = sumG + green;
+                    sumB = sumB + red;
+                }
+
+                x = i+1;
+                y = j+1;
+
+                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
+                    red = new Color(original.getRGB(x, y)).getRed();
+                    green = new Color(original.getRGB(x, y)).getGreen();
+                    blue = new Color(original.getRGB(x, y)).getBlue();
+
+                    sumR = sumR + red;
+                    sumG = sumG + green;
+                    sumB = sumB + red;
+                }
+
+                x = i-1;
+                y = j+1;
+
+                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
+                    red = new Color(original.getRGB(x, y)).getRed();
+                    green = new Color(original.getRGB(x, y)).getGreen();
+                    blue = new Color(original.getRGB(x, y)).getBlue();
+
+                    sumR = sumR + red;
+                    sumG = sumG + green;
+                    sumB = sumB + red;
+                }
+
+                x = i-1;
+                y = j-1;
+
+                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
+                    red = new Color(original.getRGB(x, y)).getRed();
+                    green = new Color(original.getRGB(x, y)).getGreen();
+                    blue = new Color(original.getRGB(x, y)).getBlue();
+
+                    sumR = sumR + red;
+                    sumG = sumG + green;
+                    sumB = sumB + red;
+                }
+
+                x = i+1;
+                y = j-1;
+
+                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
+                    red = new Color(original.getRGB(x, y)).getRed();
+                    green = new Color(original.getRGB(x, y)).getGreen();
+                    blue = new Color(original.getRGB(x, y)).getBlue();
+
+                    sumR = sumR + red;
+                    sumG = sumG + green;
+                    sumB = sumB + red;
+                }
+
+                x = i-1;
+                y = j;
+
+                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
+                    red = new Color(original.getRGB(x, y)).getRed();
+                    green = new Color(original.getRGB(x, y)).getGreen();
+                    blue = new Color(original.getRGB(x, y)).getBlue();
+
+                    sumR = sumR + red;
+                    sumG = sumG + green;
+                    sumB = sumB + red;
+                }
+
+                x = i+1;
+                y = j;
+
+                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
+                    red = new Color(original.getRGB(x, y)).getRed();
+                    green = new Color(original.getRGB(x, y)).getGreen();
+                    blue = new Color(original.getRGB(x, y)).getBlue();
+
+                    sumR = sumR + red;
+                    sumG = sumG + green;
+                    sumB = sumB + red;
+                }
+
+                if (red < k) {
+                    red = 0;
+                } else {
+                    red = 255;
+                }
+
+                if (green < k) {
+                    green = 0;
+                } else {
+                    green = 255;
+                }
+
+                if (blue < k) {
+                    blue = 0;
+                } else {
+                    blue = 255;
+                }
+
+                color = new Color(red, green, blue);
+                manuallyBinarizedImg.setRGB(i, j, color.getRGB());
             }
         }
 
-        return blackPercentageMethodImage;
+        return manuallyBinarizedImg;
     }
 
 
@@ -608,6 +796,11 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
         panel.setImg(processedImage);
     }
 
+    private void niblackBinarizationActionPerformed(java.awt.event.ActionEvent evt) {
+        BufferedImage processedImage = niblackBinarization(imageArray, 58);
+        panel.setImg(processedImage);
+    }
+
     private void resetImageActionPerformed(java.awt.event.ActionEvent evt) {
         panel.setImg(imageArray);
     }
@@ -637,7 +830,7 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
     private javax.swing.JSlider manualBinarizationValueSlider;
     private javax.swing.JButton percentBlackSelectionButton;
     private javax.swing.JButton meanIterativeSelectionButton;
-    private javax.swing.JButton entropySelectionButton;
+    private javax.swing.JButton niblackBinarizationButton;
     private javax.swing.JButton minimumErrorButton;
     private javax.swing.JButton fuzzyMinimumErrorButton;
 
