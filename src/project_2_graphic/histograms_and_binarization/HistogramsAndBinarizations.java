@@ -93,6 +93,13 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
             }
         });
 
+        meanIterativeSelectionButton.setText("Selekcja iteratywna średniej");
+        meanIterativeSelectionButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                meanIterativeSelectionActionPerformed(evt);
+            }
+        });
+
         resetImage.setText("Resetuj obrazek");
         resetImage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -462,6 +469,11 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
         return blackPercentageMethodImage;
     }
 
+    public BufferedImage meanIterativeSelection(BufferedImage imageArray) {
+
+       return null;
+    }
+
     private static int[] strechLookupTable(int a, int b, int maxI){
         int[] lookup = new int[maxI];
         for(int i=0; i<lookup.length; i++){
@@ -471,6 +483,7 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
             if(lookup[i]>maxI)
                 lookup[i]=maxI ;
         }
+
         return lookup;
     }
 
@@ -595,6 +608,10 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
         panel.setImg(processedImage);
     }
 
+    private void meanIterativeSelectionActionPerformed(java.awt.event.ActionEvent evt) {
+        BufferedImage processedImage = meanIterativeSelection(imageArray);
+
+    }
     private void resetImageActionPerformed(java.awt.event.ActionEvent evt) {
         panel.setImg(imageArray);
     }
