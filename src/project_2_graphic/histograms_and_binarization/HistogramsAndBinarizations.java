@@ -14,11 +14,9 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class HistogramsAndBinarizations extends javax.swing.JFrame implements ChangeListener {
 
@@ -79,13 +77,6 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
             }
         });
 
-        percentBlackSelectionButton.setText("Selekcja procentowa czarnego");
-        percentBlackSelectionButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                blackPercentageSelectionMethodActionPerformed(evt);
-            }
-        });
-
         manualBinarizationButton.setText("Binaryzacja manualna");
         manualBinarizationButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -93,10 +84,10 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
             }
         });
 
-        meanIterativeSelectionButton.setText("Selekcja iteratywna średniej");
-        meanIterativeSelectionButton.addActionListener(new java.awt.event.ActionListener() {
+        percentBlackSelectionButton.setText("Metoda selekcji procentowej czarnego");
+        percentBlackSelectionButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                meanIterativeSelectionActionPerformed(evt);
+                percentBlackSelectionActionPerformed(evt);
             }
         });
 
@@ -135,13 +126,13 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
                                                         .addComponent(histogramExtensionbutton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(resetImage, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(histogramEqualizationButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(manualBinarizationValueSlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(manualBinarizationButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(percentBlackSelectionButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(meanIterativeSelectionButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(entropySelectionButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(minimumErrorButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(fuzzyMinimumErrorButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(manualBinarizationValueSlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(backButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                                 )
                                 .addGap(18, 18, 18)
@@ -436,57 +427,16 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
         return manuallyBinarizedImg;
     }
 
-    public BufferedImage blackPercentageSelectionMethod(BufferedImage imageArray, double percentage) {
-        int w = imageArray.getWidth();
-        int h = imageArray.getHeight();
-        int amountOfPixels = w * h;
+    public BufferedImage percentBlackSelectionImageBinarization(BufferedImage original) {
 
-        int[] pixelTable = new int[amountOfPixels];
-//        HashMap<Integer, Integer> pixelTable2 = new HashMap<>();
-        for (int i = 0; i < w; i++) {
-            for (int j = 0; j < h; j++) {
-                int val = imageArray.getRGB(i, j);
-                int r = (0x00ff0000 & val) >> 16;
-                int g = (0x0000ff00 & val) >> 8;
-                int b = (0x000000ff & val);
-                int sum = (r + g + b);
-                if (sum == 0) sum = 1;
-                pixelTable[sum - 1] += 1;
-            }
-        }
+        int h = original.getHeight();
+        int w = original.getWidth();
+        BufferedImage manuallyBinarizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 
-        int[] LUT = new int[768];
-        double limes = ((double) percentage / 100) * ((double) amountOfPixels);
-        int nextSum = 0;
-        for (int i = 0; i < 768; ++i) {
-            nextSum = nextSum + pixelTable[i];
-            if (nextSum < limes) {
-                LUT[i] = 0;
-            } else {
-                LUT[i] = 1;
-            }
-        }
 
-        BufferedImage blackPercentageMethodImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-        for (int i = 0; i < w; i++) {
-            for (int j = 0; j < h; j++) {
-                int val = imageArray.getRGB(i, j);
-                int r = (0x00ff0000 & val) >> 16;
-                int g = (0x0000ff00 & val) >> 8;
-                int b = (0x000000ff & val);
-                int sum = (r + g + b);
-                if (LUT[sum] == 0) blackPercentageMethodImage.setRGB(i, j, Color.BLACK.getRGB());
-                else blackPercentageMethodImage.setRGB(i, j, Color.WHITE.getRGB());
-            }
-        }
-
-        return blackPercentageMethodImage;
+        return manuallyBinarizedImg;
     }
 
-    public BufferedImage meanIterativeSelection(BufferedImage imageArray) {
-
-       return null;
-    }
 
     private static int[] strechLookupTable(int a, int b, int maxI){
         int[] lookup = new int[maxI];
@@ -497,7 +447,6 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
             if(lookup[i]>maxI)
                 lookup[i]=maxI ;
         }
-
         return lookup;
     }
 
@@ -613,19 +562,15 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
     }
 
     private void manualBinarizationActionPerformed(java.awt.event.ActionEvent evt) {
-        BufferedImage processedImage = manualImageBinarization(imageArray, 200);
+        BufferedImage processedImage = manualImageBinarization(imageArray, manualBinarizationValueSlider.getValue());
         panel.setImg(processedImage);
     }
 
-    private void blackPercentageSelectionMethodActionPerformed(java.awt.event.ActionEvent evt) {
-        BufferedImage processedImage = blackPercentageSelectionMethod(imageArray, 58);
+    private void percentBlackSelectionActionPerformed(java.awt.event.ActionEvent evt) {
+        BufferedImage processedImage = percentBlackSelectionImageBinarization(imageArray);
         panel.setImg(processedImage);
     }
 
-    private void meanIterativeSelectionActionPerformed(java.awt.event.ActionEvent evt) {
-        BufferedImage processedImage = meanIterativeSelection(imageArray);
-
-    }
     private void resetImageActionPerformed(java.awt.event.ActionEvent evt) {
         panel.setImg(imageArray);
     }
