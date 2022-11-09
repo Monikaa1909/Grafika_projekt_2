@@ -84,6 +84,13 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
             }
         });
 
+        percentBlackSelectionButton.setText("Metoda selekcji procentowej czarnego");
+        percentBlackSelectionButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                percentBlackSelectionActionPerformed(evt);
+            }
+        });
+
         resetImage.setText("Resetuj obrazek");
         resetImage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -119,13 +126,13 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
                                                         .addComponent(histogramExtensionbutton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(resetImage, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(histogramEqualizationButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(manualBinarizationValueSlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(manualBinarizationButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(percentBlackSelectionButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(meanIterativeSelectionButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(entropySelectionButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(minimumErrorButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(fuzzyMinimumErrorButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(manualBinarizationValueSlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(backButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                                 )
                                 .addGap(18, 18, 18)
@@ -388,22 +395,112 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
         for (int i = 0; i < w; i++) {
             for (int j = 0; j < h; j++) {
 
+                Color color = new Color(original.getRGB(i, j));
+                int red = color.getRed();
+                int green = color.getGreen();
+                int blue = color.getBlue();
 
-                //Get RGB Value
-                int val = original.getRGB(i, j);
-                int r = (0x00ff0000 & val) >> 16;
-                int g = (0x0000ff00 & val) >> 8;
-                int b = (0x000000ff & val);
-                int sum = (r + g + b);
-                if (sum >= threshold) {
-                    manuallyBinarizedImg.setRGB(i, j, Color.WHITE.getRGB());
+                int sum = (red + green + blue);
+                if (red < threshold) {
+                    red = 0;
                 } else {
-                    manuallyBinarizedImg.setRGB(i, j, 0);
+                    red = 255;
                 }
+
+                if (green < threshold) {
+                    green = 0;
+                } else {
+                    green = 255;
+                }
+
+                if (blue < threshold) {
+                    blue = 0;
+                } else {
+                    blue = 255;
+                }
+
+                color = new Color(red, green, blue);
+                manuallyBinarizedImg.setRGB(i, j, color.getRGB());
             }
         }
 
         return manuallyBinarizedImg;
+    }
+
+    public BufferedImage percentBlackSelectionImageBinarization(BufferedImage original) {
+
+        int h = original.getHeight();
+        int w = original.getWidth();
+        int sumBlack = 0;
+        double percentageBlack;
+        BufferedImage manuallyBinarizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        for (int i = 0; i < w; i++) {
+            for (int j = 0; j < h; j++) {
+
+                Color color = new Color(original.getRGB(i, j));
+                int red = color.getRed();
+                int green = color.getGreen();
+                int blue = color.getBlue();
+
+                if (red == 0 && green == 0 && blue == 0) {
+                    sumBlack += 1;
+                }
+            }
+        }
+
+        percentageBlack = ((double)sumBlack) / ((double)(w*h));
+        double limes = ((double)percentageBlack/100) * ((double)(w*h));
+        System.out.println(limes);
+
+        System.out.println(w*h);
+        ArrayList<int[]> LUT = percentBlackSelectionImageBinarizationLUT(original);
+
+        return manuallyBinarizedImg;
+    }
+
+    private ArrayList<int[]> percentBlackSelectionImageBinarizationLUT(BufferedImage input) {
+        int w = input.getWidth();
+        int h = input.getHeight();
+        // Get an image histogram - calculated values by R, G, B channels
+        ArrayList<int[]> imageHist = imageHistogram(input);
+
+        // Create the lookup table
+        ArrayList<int[]> imageLUT = new ArrayList<int[]>();
+
+        // Fill the lookup table
+        int[] rLUT = new int[256];
+        int[] gLUT = new int[256];
+        int[] bLUT = new int[256];
+
+        for (int i = 0; i < rLUT.length; i++) rLUT[i] = 0;
+        for (int i = 0; i < gLUT.length; i++) gLUT[i] = 0;
+        for (int i = 0; i < bLUT.length; i++) bLUT[i] = 0;
+
+        for (int i = 0; i < w; i++) {
+            for (int j = 0; j < h; j++) {
+
+                Color color = new Color(input.getRGB(i, j));
+                int red = color.getRed();
+                int green = color.getGreen();
+                int blue = color.getBlue();
+
+                rLUT[red]++;
+                gLUT[green]++;
+                bLUT[blue]++;
+            }
+        }
+
+        imageLUT.add(rLUT);
+        imageLUT.add(gLUT);
+        imageLUT.add(bLUT);
+
+        int sum = 0;
+        for (int i = 0; i < 255; i++) {
+            sum += imageLUT.get(0)[i];
+        }
+        System.out.println(sum);
+        return imageLUT;
+
     }
 
     private static int[] strechLookupTable(int a, int b, int maxI){
@@ -530,7 +627,12 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
     }
 
     private void manualBinarizationActionPerformed(java.awt.event.ActionEvent evt) {
-        BufferedImage processedImage = manualImageBinarization(imageArray, 200);
+        BufferedImage processedImage = manualImageBinarization(imageArray, manualBinarizationValueSlider.getValue());
+        panel.setImg(processedImage);
+    }
+
+    private void percentBlackSelectionActionPerformed(java.awt.event.ActionEvent evt) {
+        BufferedImage processedImage = percentBlackSelectionImageBinarization(imageArray);
         panel.setImg(processedImage);
     }
 
