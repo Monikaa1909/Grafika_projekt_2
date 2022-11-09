@@ -445,6 +445,7 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
                 LUT[i] = 1;
             }
         }
+
         BufferedImage blackPercentageMethodImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
         for (int i = 0; i < w; i++) {
             for (int j = 0; j < h; j++) {
@@ -590,7 +591,7 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
     }
 
     private void blackPercentageSelectionMethodActionPerformed(java.awt.event.ActionEvent evt) {
-        BufferedImage processedImage = blackPercentageSelectionMethod(imageArray, 60);
+        BufferedImage processedImage = blackPercentageSelectionMethod(imageArray, 58);
         panel.setImg(processedImage);
     }
 
