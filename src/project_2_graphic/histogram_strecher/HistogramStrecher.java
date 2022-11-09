@@ -25,39 +25,19 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
     }
 
     private void initComponents() {
-
         panel = new Panel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
         JButton backButton = new JButton("Back");
         backButton.setVisible(true);
         backButton.addActionListener(new HistogramStrecher.BackListener());
-        addRed = new AdditionSlider();
-        multiplyRed = new MultiplicationSlider();
-        addGreen = new AdditionSlider();
-        addBlue = new AdditionSlider();
-        multiplyGreen = new MultiplicationSlider();
-        multiplyBlue = new MultiplicationSlider();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        shadeOfGrey1 = new javax.swing.JToggleButton();
-        shadeOfGrey2 = new javax.swing.JButton();
+
+        histogramEqualizationLabel = new javax.swing.JToggleButton();
+        histogramExtension = new javax.swing.JButton();
         resetImage = new javax.swing.JButton();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        brightness = new BrightnessSlider();
-        jLabel11 = new javax.swing.JLabel();
-        contrast = new Contrast();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         openButton = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
         panel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         javax.swing.GroupLayout panelLayout = new javax.swing.GroupLayout(panel);
@@ -71,57 +51,17 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
                         .addGap(0, 476, Short.MAX_VALUE)
         );
 
-        jLabel1.setText("Dodawanie / Odejmowanie");
-
-        jLabel2.setText("Mnożenie / Dzielenie");
-
-        jLabel3.setText("R:");
-
-        jLabel4.setText("G:");
-
-        jLabel5.setText("B:");
-
-        addRed.setMaximum(255);
-        addRed.setMinimum(-255);
-        addRed.setValue(0);
-
-        addGreen.setMaximum(255);
-        addGreen.setMinimum(-255);
-        addGreen.setValue(0);
-
-        addBlue.setMaximum(255);
-        addBlue.setMinimum(-255);
-        addBlue.setValue(0);
-
-        multiplyRed.setMaximum(400);
-        multiplyRed.setMinimum(1);
-        multiplyRed.setValue(200);
-
-        multiplyGreen.setMaximum(400);
-        multiplyGreen.setMinimum(1);
-        multiplyGreen.setValue(200);
-
-        multiplyBlue.setMaximum(400);
-        multiplyBlue.setMinimum(1);
-        multiplyBlue.setValue(200);
-
-        jLabel6.setText("R:");
-
-        jLabel7.setText("G:");
-
-        jLabel8.setText("B:");
-
-        shadeOfGrey1.setText("Wyrównaj histogram");
-        shadeOfGrey1.addActionListener(new java.awt.event.ActionListener() {
+        histogramEqualizationLabel.setText("Wyrównaj histogram");
+        histogramEqualizationLabel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 histogramEqualizationActionPerformed(evt);
             }
         });
 
-        shadeOfGrey2.setText("Odcień szarości 2");
-        shadeOfGrey2.addActionListener(new java.awt.event.ActionListener() {
+        histogramExtension.setText("Rozszerz histogram");
+        histogramExtension.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                shadeOfGrey2ActionPerformed(evt);
+                extendHistogram(evt);
             }
         });
 
@@ -132,24 +72,7 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
             }
         });
 
-        jLabel9.setText("Odcienie szarości");
-
-        jLabel10.setText("Jasność");
-
-//        brightness.setMaximum(255);
-//        brightness.setMinimum(-255);
-        brightness.setMaximum(128);
-        brightness.setMinimum(0);
-        brightness.setValue(2);
-
-        jLabel11.setText("Kontrast");
-
-        contrast.setMaximum(400);
-        contrast.setMinimum(1);
-        contrast.setValue(200);
-
         jMenu1.setText("File");
-
         openButton.setText("Open");
         openButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -172,63 +95,11 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
                         .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addGroup(layout.createSequentialGroup()
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addGap(72, 72, 72)
-                                                                .addComponent(jLabel2))
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addContainerGap()
-                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                                                .addComponent(jLabel6)
-                                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                                .addComponent(multiplyRed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                                                .addComponent(jLabel7)
-                                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                                .addComponent(multiplyGreen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                                                .addComponent(jLabel8)
-                                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                                .addComponent(multiplyBlue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addGap(61, 61, 61)
-                                                                .addComponent(jLabel1))
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addContainerGap()
-                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                                        .addGroup(layout.createSequentialGroup()
-                                                                                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 11, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                                .addComponent(addBlue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                                        .addGroup(layout.createSequentialGroup()
-                                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                                                        .addComponent(jLabel3)
-                                                                                        .addComponent(jLabel4))
-                                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                                                        .addComponent(addRed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                                        .addComponent(addGreen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addGap(70, 70, 70)
-                                                                .addComponent(jLabel9))
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addGap(92, 92, 92)
-                                                                .addComponent(jLabel10))
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addGap(94, 94, 94)
-                                                                .addComponent(jLabel11))
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addContainerGap()
-                                                                .addComponent(contrast, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                                .addGap(0, 0, Short.MAX_VALUE))
-                                        .addGroup(layout.createSequentialGroup()
                                                 .addContainerGap()
                                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(brightness, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(shadeOfGrey2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(histogramExtension, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(resetImage, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(shadeOfGrey1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(histogramEqualizationLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(backButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                                 .addGap(18, 18, 18)
                                 .addComponent(panel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -242,48 +113,11 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
                                                 .addContainerGap(22, Short.MAX_VALUE)
                                                 .addComponent(panel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                         .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                                .addGap(6, 6, 6)
-                                                .addComponent(jLabel1)
+                                                .addGap(465, 465, 465)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(addRed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(jLabel3))
+                                                .addComponent(histogramEqualizationLabel)
                                                 .addGap(8, 8, 8)
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(jLabel4)
-                                                        .addComponent(addGreen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(addBlue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(jLabel5))
-                                                .addGap(33, 33, 33)
-                                                .addComponent(jLabel2)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(multiplyRed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(jLabel6))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(multiplyGreen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(jLabel7))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(multiplyBlue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(jLabel8))
-                                                .addGap(18, 18, 18)
-                                                .addComponent(jLabel10)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(brightness, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(jLabel11)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(contrast, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(18, 18, 18)
-                                                .addComponent(jLabel9)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(shadeOfGrey1)
-                                                .addGap(8, 8, 8)
-                                                .addComponent(shadeOfGrey2)
+                                                .addComponent(histogramExtension)
                                                 .addGap(8, 8, 8)
                                                 .addComponent(resetImage)
                                                 .addGap(8, 8, 8)
@@ -291,14 +125,6 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
                                 .addGap(0, 12, Short.MAX_VALUE))
         );
 
-        addRed.addChangeListener(this);
-        addGreen.addChangeListener(this);
-        addBlue.addChangeListener(this);
-        multiplyBlue.addChangeListener(this);
-        multiplyGreen.addChangeListener(this);
-        multiplyRed.addChangeListener(this);
-        brightness.addChangeListener(this);
-        contrast.addChangeListener(this);
         pack();
     }
 
@@ -334,12 +160,10 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
 
                 // Write pixels into image
                 histogramEQ.setRGB(i, j, newPixel);
-
             }
         }
 
         return histogramEQ;
-
     }
 
     // Get the histogram equalization lookup table for separate R, G, B channels
@@ -420,7 +244,6 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
                 rhistogram[red]++;
                 ghistogram[green]++;
                 bhistogram[blue]++;
-
             }
         }
 
@@ -430,7 +253,6 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
         hist.add(bhistogram);
 
         return hist;
-
     }
 
     // Convert R, G, B, Alpha to standard 8 bit
@@ -446,7 +268,6 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
         newPixel += blue;
 
         return newPixel;
-
     }
 
 
@@ -473,7 +294,6 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
                 } catch (IOException e) {
                     System.out.println("NIE DZIALA");
                 }
-
             }
         }
     }
@@ -511,7 +331,6 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
 
             panel.setImg(imageArray);
             this.pack();
-
         } else {
             System.out.println("ppm6");
             FileInputStream input = new FileInputStream((file));
@@ -550,7 +369,6 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
                 panel.setImg(imageArray);
                 this.pack();
             }
-
         }
     }
 
@@ -559,99 +377,16 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
         panel.setImg(processedImage);
     }
 
-    private void shadeOfGrey2ActionPerformed(java.awt.event.ActionEvent evt) {
-
+    private void extendHistogram(java.awt.event.ActionEvent evt) {
+        //TODO miejsce na kod "rozciągania obrazka"
     }
+
     private void resetImageActionPerformed(java.awt.event.ActionEvent evt) {
-        resetAllSliders();
         panel.setImg(imageArray);
     }
 
-    public void additionSubtracion() {
-
-    }
-
-    public void multiplicationDivision() {
-
-    }
-
-    public void brightness() {
-
-    }
-
-    public void contrast(){
-
-    }
-
     @Override
-    public void stateChanged(ChangeEvent e) {
-
-        if ("AdditionSlider".equals(e.getSource().getClass().getSimpleName())) {
-            // System.out.println("dodawanie / odejmowanie");
-            new Thread(new Runnable() {
-                public void run() {
-                    additionSubtracion();
-                }
-            }).start();
-
-        } else if ("MultiplicationSlider".equals(e.getSource().getClass().getSimpleName())) {
-            //System.out.println("mnozenie / dzielenie");
-            new Thread(new Runnable() {
-                public void run() {
-                    multiplicationDivision();
-                }
-            }).start();
-
-        } else if ("BrightnessSlider".equals(e.getSource().getClass().getSimpleName())) {
-            //System.out.println("jasnosc");
-            new Thread(new Runnable() {
-                public void run() {
-                    brightness();
-                }
-            }).start();
-        } else if ("Contrast".equals(e.getSource().getClass().getSimpleName())) {
-            //System.out.println("kontrast");
-            new Thread(new Runnable() {
-                public void run() {
-                    contrast();
-                }
-            }).start();
-        }
-
-    }
-
-    public static void main(String args[]) {
-
-        new PointTransformation().setVisible(true);
-
-    }
-
-    public void resetAddition() {
-        if (addGreen != null) addGreen.setValue(0);
-        if (addRed != null) addRed.setValue(0);
-        if (addBlue != null) addBlue.setValue(0);
-    }
-
-    public void resetMultiplication() {
-        if (multiplyBlue != null) multiplyBlue.setValue(200);
-        if (multiplyRed != null) multiplyRed.setValue(200);
-        if (multiplyGreen != null) multiplyGreen.setValue(200);
-    }
-
-    public void resetBrightness() {
-        if (brightness != null) brightness.setValue(0);
-    }
-
-    public void resetContrast() {
-        if (contrast != null) contrast.setValue(200);
-    }
-
-    public void resetAllSliders() {
-        resetAddition();
-        resetMultiplication();
-        resetContrast();
-        resetBrightness();
-    }
+    public void stateChanged(ChangeEvent e) {}
 
     private class BackListener implements ActionListener {
         @Override
@@ -662,29 +397,11 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
         }
     }
 
-    private AdditionSlider addBlue;
-    private AdditionSlider addGreen;
-    private AdditionSlider addRed;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
+
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
-    private BrightnessSlider brightness;
-    private Contrast contrast;
-    private MultiplicationSlider multiplyBlue;
-    private MultiplicationSlider multiplyGreen;
-    private MultiplicationSlider multiplyRed;
-    private javax.swing.JToggleButton shadeOfGrey1;
-    private javax.swing.JButton shadeOfGrey2;
+    private javax.swing.JToggleButton histogramEqualizationLabel;
+    private javax.swing.JButton histogramExtension;
     private javax.swing.JButton resetImage;
     private javax.swing.JMenuItem openButton;
     private Panel panel;
@@ -693,12 +410,4 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
     private int nrPPM;
     private int maxRGB;
     private BufferedImage imageArray;
-    int poprzedniDodanyR = 0;
-    int poprzedniDodanyG = 0;
-    int poprzedniDodanyB = 0;
-    int poprzedniMnozonyR = 200;
-    int poprzedniMnozonyG = 200;
-    int poprzedniMnozonyB = 200;
-
-
 }
