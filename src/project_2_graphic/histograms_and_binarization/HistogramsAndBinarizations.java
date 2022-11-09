@@ -442,72 +442,6 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
 
         BufferedImage manuallyBinarizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 
-        int average;
-        int deviation;
-
-        int x, y;
-
-        int red;
-        int green;
-        int blue;
-
-        for (int i = 0; i < w; i++) {
-            for (int j = 0; j < h; j++) {
-
-                int sumR = 0;
-                int sumG = 0;
-                int sumB = 0;
-
-                red = new Color(original.getRGB(i, j)).getRed();
-                green = new Color(original.getRGB(i, j)).getGreen();
-                blue = new Color(original.getRGB(i, j)).getBlue();
-
-                sumR = sumR + red;
-                sumG = sumG + green;
-                sumB = sumB + red;
-
-                x = i;
-                j = j-1;
-
-                if ()
-                red = new Color(original.getRGB(i, j)).getRed();
-                green = new Color(original.getRGB(i, j)).getGreen();
-                blue = new Color(original.getRGB(i, j)).getBlue();
-
-                if (red < k) {
-                    red = 0;
-                } else {
-                    red = 255;
-                }
-
-                if (green < k) {
-                    green = 0;
-                } else {
-                    green = 255;
-                }
-
-                if (blue < k) {
-                    blue = 0;
-                } else {
-                    blue = 255;
-                }
-
-                color = new Color(red, green, blue);
-                manuallyBinarizedImg.setRGB(i, j, color.getRGB());
-            }
-        }
-
-        return manuallyBinarizedImg;
-    }
-
-    public BufferedImage niblackBinarization(BufferedImage original, int k) {
-
-        int h = original.getHeight();
-        int w = original.getWidth();
-
-
-        BufferedImage manuallyBinarizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-
         int averageR;
         int deviation;
 
@@ -654,12 +588,59 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
                     blue = 255;
                 }
 
-                color = new Color(red, green, blue);
-                manuallyBinarizedImg.setRGB(i, j, color.getRGB());
+//                color = new Color(red, green, blue);
+//                manuallyBinarizedImg.setRGB(i, j, color.getRGB());
             }
         }
 
         return manuallyBinarizedImg;
+    }
+
+    public BufferedImage percentBlackSelectionImageBinarization(BufferedImage imageArray, double percentage) {
+        int h = imageArray.getHeight();
+        int w = imageArray.getWidth();
+        int amountOfPixels = w * h;
+
+        int[] pixelTable = new int[amountOfPixels];
+//        HashMap<Integer, Integer> pixelTable2 = new HashMap<>();
+        for (int i = 0; i < w; i++) {
+            for (int j = 0; j < h; j++) {
+                int val = imageArray.getRGB(i, j);
+                int r = (0x00ff0000 & val) >> 16;
+                int g = (0x0000ff00 & val) >> 8;
+                int b = (0x000000ff & val);
+                int sum = (r + g + b);
+                if (sum == 0) sum = 1;
+                pixelTable[sum - 1] += 1;
+            }
+        }
+
+        int[] LUT = new int[768];
+        double limes = ((double) percentage / 100) * ((double) amountOfPixels);
+        int nextSum = 0;
+        for (int i = 0; i < 768; ++i) {
+            nextSum = nextSum + pixelTable[i];
+            if (nextSum < limes) {
+                LUT[i] = 0;
+            } else {
+                LUT[i] = 1;
+            }
+        }
+
+        BufferedImage blackPercentageMethodImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        for (int i = 0; i < w; i++) {
+            for (int j = 0; j < h; j++) {
+                int val = imageArray.getRGB(i, j);
+                int r = (0x00ff0000 & val) >> 16;
+                int g = (0x0000ff00 & val) >> 8;
+                int b = (0x000000ff & val);
+                int sum = (r + g + b);
+                if (LUT[sum] == 0) blackPercentageMethodImage.setRGB(i, j, Color.BLACK.getRGB());
+                else blackPercentageMethodImage.setRGB(i, j, Color.WHITE.getRGB());
+            }
+        }
+
+        return blackPercentageMethodImage;
     }
 
 
