@@ -2,26 +2,13 @@ package project_2_graphic;
 
 import project_2_graphic.color_manager.ColorManager;
 import project_2_graphic.color_manager.CubeFrame;
-import project_2_graphic.histogram_strecher.HistogramStrecher;
+import project_2_graphic.histograms_and_binarization.HistogramsAndBinarizations;
 import project_2_graphic.point_transformations.PointTransformation;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class MainWindow extends JFrame {
 
@@ -63,7 +50,7 @@ public class MainWindow extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             dispose();
-            HistogramStrecher o = new HistogramStrecher();
+            HistogramsAndBinarizations o = new HistogramsAndBinarizations();
             o.setVisible(true);
         }
     }

@@ -1,4 +1,4 @@
-package project_2_graphic.histogram_strecher;
+package project_2_graphic.histograms_and_binarization;
 
 import project_2_graphic.MainWindow;
 import project_2_graphic.point_transformations.*;
@@ -18,9 +18,9 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class HistogramStrecher extends javax.swing.JFrame implements ChangeListener {
+public class HistogramsAndBinarizations extends javax.swing.JFrame implements ChangeListener {
 
-    public HistogramStrecher() {
+    public HistogramsAndBinarizations() {
         initComponents();
     }
 
@@ -28,10 +28,11 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
         panel = new Panel();
         JButton backButton = new JButton("Back");
         backButton.setVisible(true);
-        backButton.addActionListener(new HistogramStrecher.BackListener());
+        backButton.addActionListener(new HistogramsAndBinarizations.BackListener());
 
-        histogramEqualizationLabel = new javax.swing.JToggleButton();
-        histogramExtension = new javax.swing.JButton();
+        histogramEqualizationButton = new javax.swing.JToggleButton();
+        histogramExtensionbutton = new javax.swing.JButton();
+        manualBinarizationButton = new javax.swing.JButton();
         resetImage = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
@@ -51,17 +52,24 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
                         .addGap(0, 476, Short.MAX_VALUE)
         );
 
-        histogramEqualizationLabel.setText("Wyrównaj histogram");
-        histogramEqualizationLabel.addActionListener(new java.awt.event.ActionListener() {
+        histogramEqualizationButton.setText("Wyrównaj histogram");
+        histogramEqualizationButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 histogramEqualizationActionPerformed(evt);
             }
         });
 
-        histogramExtension.setText("Rozszerz histogram");
-        histogramExtension.addActionListener(new java.awt.event.ActionListener() {
+        histogramExtensionbutton.setText("Rozszerz histogram");
+        histogramExtensionbutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                extendHistogram(evt);
+                extendHistogramActionPerformed(evt);
+            }
+        });
+
+        manualBinarizationButton.setText("Binaryzacja manualna");
+        manualBinarizationButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                manualBinarizationActionPerformed(evt);
             }
         });
 
@@ -97,9 +105,10 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
                                         .addGroup(layout.createSequentialGroup()
                                                 .addContainerGap()
                                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(histogramExtension, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(histogramExtensionbutton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(resetImage, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(histogramEqualizationLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(histogramEqualizationButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+
                                                         .addComponent(backButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                                 .addGap(18, 18, 18)
                                 .addComponent(panel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -115,9 +124,9 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
                                         .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                                 .addGap(465, 465, 465)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(histogramEqualizationLabel)
+                                                .addComponent(histogramEqualizationButton)
                                                 .addGap(8, 8, 8)
-                                                .addComponent(histogramExtension)
+                                                .addComponent(histogramExtensionbutton)
                                                 .addGap(8, 8, 8)
                                                 .addComponent(resetImage)
                                                 .addGap(8, 8, 8)
@@ -270,6 +279,91 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
         return newPixel;
     }
 
+    public BufferedImage histogramStreching(BufferedImage original) {
+
+        BufferedImage histogramST = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
+
+        int max = new Color(original.getRGB(0, 0)).getRed();
+        int min = new Color(original.getRGB(0, 0)).getRed();
+
+        for(int i=0 ; i <original.getWidth(); i++) {
+            for(int j =0; j<original.getHeight(); j++) {
+                Color color = new Color(original.getRGB(i, j));
+                int red = color.getRed();
+                int green = color.getGreen();
+                int blue = color.getBlue();
+
+                if(red > max) max = red;
+                if(green > max) max = green;
+                if(blue > max) max = blue;
+
+                if(red < min) min = red;
+                if(green < min) min = green;
+                if(blue < min) min = blue;
+            }
+        }
+
+        System.out.println("Max=");
+        System.out.println(max);
+        System.out.println("Min=");
+        System.out.println(min);
+
+        int[] table = strechLookupTable(min, max, 256);
+
+        for(int i=0 ; i <original.getWidth(); i++){
+            for(int j =0; j<original.getHeight(); j++){
+                Color color = new Color(original.getRGB(i, j));
+                int red = color.getRed();
+                int green = color.getGreen();
+                int blue = color.getBlue();
+
+                red = table[red];
+                if(red<0)
+                    red =0;
+                if(red>255)
+                    red=255 ;
+
+                green = table[green];
+                if(green<0)
+                    green =0;
+                if(green>255)
+                    green=255 ;
+
+                blue = table[blue];
+                if(blue<0)
+                    blue =0;
+                if(blue>255)
+                    blue=255 ;
+
+                color = new Color(red, green, blue);
+                histogramST.setRGB(i, j, color.getRGB());
+            }
+        }
+        System.out.println("Max=");
+        System.out.println(max);
+        System.out.println("Min=");
+        System.out.println(min);
+        return histogramST;
+    }
+
+    public BufferedImage manualImageBinarization(BufferedImage original) {
+
+        BufferedImage histogramST = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
+
+        return histogramST;
+    }
+
+    private static int[] strechLookupTable(int a, int b, int maxI){
+        int[] lookup = new int[maxI];
+        for(int i=0; i<lookup.length; i++){
+            lookup[i] = ((maxI)/(b-a))*(i-a);
+            if(lookup[i]<0)
+                lookup[i] =0;
+            if(lookup[i]>maxI)
+                lookup[i]=maxI ;
+        }
+        return lookup;
+    }
 
     private void openButtonActionPerformed(java.awt.event.ActionEvent evt) throws IOException {
         JFileChooser fileChooser = new JFileChooser();
@@ -377,8 +471,14 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
         panel.setImg(processedImage);
     }
 
-    private void extendHistogram(java.awt.event.ActionEvent evt) {
-        //TODO miejsce na kod "rozciągania obrazka"
+    private void extendHistogramActionPerformed(java.awt.event.ActionEvent evt) {
+        BufferedImage processedImage = histogramStreching(imageArray);
+        panel.setImg(processedImage);
+    }
+
+    private void manualBinarizationActionPerformed(java.awt.event.ActionEvent evt) {
+        BufferedImage processedImage = manualImageBinarization(imageArray);
+        panel.setImg(processedImage);
     }
 
     private void resetImageActionPerformed(java.awt.event.ActionEvent evt) {
@@ -400,8 +500,9 @@ public class HistogramStrecher extends javax.swing.JFrame implements ChangeListe
 
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JToggleButton histogramEqualizationLabel;
-    private javax.swing.JButton histogramExtension;
+    private javax.swing.JToggleButton histogramEqualizationButton;
+    private javax.swing.JButton histogramExtensionbutton;
+    private javax.swing.JButton manualBinarizationButton;
     private javax.swing.JButton resetImage;
     private javax.swing.JMenuItem openButton;
     private Panel panel;

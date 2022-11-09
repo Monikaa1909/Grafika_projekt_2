@@ -1,4 +1,4 @@
-package project_2_graphic.histogram_strecher;
+package project_2_graphic.histograms_and_binarization;
 
 
 import javax.swing.*;

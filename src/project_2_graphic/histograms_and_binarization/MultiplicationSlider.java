@@ -3,15 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package project_2_graphic.histogram_strecher;
+package project_2_graphic.histograms_and_binarization;
 
 import javax.swing.*;
 
-public class Contrast extends JSlider {
+public class MultiplicationSlider extends JSlider {
 
-    public Contrast() {
+    public MultiplicationSlider() {
         super();
     }
-    
     
 }

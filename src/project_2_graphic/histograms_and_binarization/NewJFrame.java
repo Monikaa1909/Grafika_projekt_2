@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package project_2_graphic.histogram_strecher;
+package project_2_graphic.histograms_and_binarization;
 
 public class NewJFrame extends javax.swing.JFrame {
 
