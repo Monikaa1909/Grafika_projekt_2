@@ -1,9 +1,11 @@
 package project_2_graphic.histograms_and_binarization;
 
+import javafx.embed.swing.SwingFXUtils;
 import project_2_graphic.MainWindow;
 import project_2_graphic.point_transformations.*;
 import project_2_graphic.point_transformations.Panel;
 
+import java.awt.Color;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -12,11 +14,18 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static java.lang.Math.pow;
+import static java.lang.Math.sqrt;
+import static sun.awt.X11.XConstants.GrayScale;
 
 public class HistogramsAndBinarizations extends javax.swing.JFrame implements ChangeListener {
 
@@ -274,7 +283,6 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
         imageLUT.add(bhistogram);
 
         return imageLUT;
-
     }
 
     // Return an ArrayList containing histogram values for separate R, G, B channels
@@ -434,341 +442,50 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
         return manuallyBinarizedImg;
     }
 
-    public BufferedImage niblackBinarization(BufferedImage original, int k) {
+    public BufferedImage niblackBinarization(BufferedImage bi) {
 
-        int h = original.getHeight();
-        int w = original.getWidth();
+        BufferedImage resultImage = new BufferedImage(bi.getWidth(), bi.getHeight(), bi.getType());
+        int width  = bi.getWidth();
+        int height = bi.getHeight();
+        int neighbourWindowBound = 2;
+        int neighbourWindowSize = 2 * neighbourWindowBound + 1;
+        double k = -0.1;
 
-
-        BufferedImage manuallyBinarizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-
-        double  averageR, averageG, averageB;
-        double  deviationR, deviationG, deviationB;
-
-        double[][] TR = new double[h][w];
-        double[][] TG = new double[h][w];
-        double[][] TB = new double[h][w];
-
-        int sumR;
-        int sumG;
-        int sumB;
-
-        int x, y;
-        int red;
-        int green;
-        int blue;
-
-        for (int i = 0; i < w; i++) {
-            for (int j = 0; j < h; j++) {
-
-                sumR = 0;
-                sumG = 0;
-                sumB = 0;
-                int neighboursCounter = 1;
-
-                red = new Color(original.getRGB(i, j)).getRed();
-                green = new Color(original.getRGB(i, j)).getGreen();
-                blue = new Color(original.getRGB(i, j)).getBlue();
-
-                sumR = sumR + red;
-                sumG = sumG + green;
-                sumB = sumB + blue;
-
-                x = i;
-                y = j-1;
-
-                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
-                    red = new Color(original.getRGB(x, y)).getRed();
-                    green = new Color(original.getRGB(x, y)).getGreen();
-                    blue = new Color(original.getRGB(x, y)).getBlue();
-
-                    sumR = sumR + red;
-                    sumG = sumG + green;
-                    sumB = sumB + blue;
-                    neighboursCounter += 1;
+        for (int i = neighbourWindowBound; i < width - neighbourWindowBound; i++) {
+            for (int j = neighbourWindowBound; j < height - neighbourWindowBound; j++) {
+                double mean  = 0;
+                double[][] neighbourWindowLuminances = new double[neighbourWindowSize][neighbourWindowSize];
+                for (int a = -neighbourWindowBound; a <= neighbourWindowBound; a++) {
+                    for (int b = -neighbourWindowBound; b <= neighbourWindowBound; b++) {
+                        double luminance = getRGBLuminance(bi.getRGB(i + a, j + b));
+                        mean += luminance;
+                        neighbourWindowLuminances[a + neighbourWindowBound][b + neighbourWindowBound] = luminance;
+                    }
                 }
-
-                x = i;
-                y = j+1;
-
-                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
-                    red = new Color(original.getRGB(x, y)).getRed();
-                    green = new Color(original.getRGB(x, y)).getGreen();
-                    blue = new Color(original.getRGB(x, y)).getBlue();
-
-                    sumR = sumR + red;
-                    sumG = sumG + green;
-                    sumB = sumB + blue;
-                    neighboursCounter += 1;
+                mean /= pow(neighbourWindowSize, 2);
+                double standardDeviation = 0;
+                for (int a = 0; a < neighbourWindowSize; a++) {
+                    for (int b = 0; b < neighbourWindowSize; b++) {
+                        standardDeviation += pow(neighbourWindowLuminances[a][b] - mean, 2);
+                    }
                 }
+                standardDeviation = sqrt(standardDeviation / (neighbourWindowSize * neighbourWindowSize));
 
-                x = i+1;
-                y = j+1;
-
-                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
-                    red = new Color(original.getRGB(x, y)).getRed();
-                    green = new Color(original.getRGB(x, y)).getGreen();
-                    blue = new Color(original.getRGB(x, y)).getBlue();
-
-                    sumR = sumR + red;
-                    sumG = sumG + green;
-                    sumB = sumB + blue;
-                    neighboursCounter += 1;
+                if(neighbourWindowLuminances[neighbourWindowBound][neighbourWindowBound] > mean + k * standardDeviation){
+                    resultImage.setRGB(i, j, Color.WHITE.getRGB());
                 }
-
-                x = i-1;
-                y = j+1;
-
-                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
-                    red = new Color(original.getRGB(x, y)).getRed();
-                    green = new Color(original.getRGB(x, y)).getGreen();
-                    blue = new Color(original.getRGB(x, y)).getBlue();
-
-                    sumR = sumR + red;
-                    sumG = sumG + green;
-                    sumB = sumB + blue;
-                    neighboursCounter += 1;
+                else{
+                    resultImage.setRGB(i, j, Color.BLACK.getRGB());
                 }
-
-                x = i-1;
-                y = j-1;
-
-                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
-                    red = new Color(original.getRGB(x, y)).getRed();
-                    green = new Color(original.getRGB(x, y)).getGreen();
-                    blue = new Color(original.getRGB(x, y)).getBlue();
-
-                    sumR = sumR + red;
-                    sumG = sumG + green;
-                    sumB = sumB + blue;
-                    neighboursCounter += 1;
-                }
-
-                x = i+1;
-                y = j-1;
-
-                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
-                    red = new Color(original.getRGB(x, y)).getRed();
-                    green = new Color(original.getRGB(x, y)).getGreen();
-                    blue = new Color(original.getRGB(x, y)).getBlue();
-
-                    sumR = sumR + red;
-                    sumG = sumG + green;
-                    sumB = sumB + blue;
-                    neighboursCounter += 1;
-                }
-
-                x = i-1;
-                y = j;
-
-                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
-                    red = new Color(original.getRGB(x, y)).getRed();
-                    green = new Color(original.getRGB(x, y)).getGreen();
-                    blue = new Color(original.getRGB(x, y)).getBlue();
-
-                    sumR = sumR + red;
-                    sumG = sumG + green;
-                    sumB = sumB + blue;
-                    neighboursCounter += 1;
-                }
-
-                x = i+1;
-                y = j;
-
-                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
-                    red = new Color(original.getRGB(x, y)).getRed();
-                    green = new Color(original.getRGB(x, y)).getGreen();
-                    blue = new Color(original.getRGB(x, y)).getBlue();
-
-                    sumR = sumR + red;
-                    sumG = sumG + green;
-                    sumB = sumB + blue;
-                    neighboursCounter += 1;
-                }
-
-                averageR = (double) sumR/neighboursCounter;
-                averageB = (double) sumB/neighboursCounter;
-                averageG = (double) sumG/neighboursCounter;
-
-                if (averageR < 0) {
-                    averageR = 0;
-                } else if (averageR > 255) {
-                    averageR = 255;
-                }
-
-                if (averageB < 0) {
-                    averageB = 0;
-                } else if (averageB > 255) {
-                    averageB = 255;
-                }
-
-                if (averageG < 0) {
-                    averageG = 0;
-                } else if (averageG > 255) {
-                    averageG = 255;
-                }
-
-                sumR = 0;
-                sumG = 0;
-                sumB = 0;
-
-                // -----------------------
-                red = new Color(original.getRGB(i, j)).getRed();
-                green = new Color(original.getRGB(i, j)).getGreen();
-                blue = new Color(original.getRGB(i, j)).getBlue();
-
-                sumR = sumR + (red - (int)averageR) * (red - (int)averageR);
-                sumG = sumG + (green - (int)averageG) * (green - (int)averageG);
-                sumB = sumB + (blue - (int)averageB) * (blue - (int)averageB);
-
-                x = i;
-                y = j-1;
-
-                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
-                    red = new Color(original.getRGB(x, y)).getRed();
-                    green = new Color(original.getRGB(x, y)).getGreen();
-                    blue = new Color(original.getRGB(x, y)).getBlue();
-
-                    sumR = sumR + (red - (int)averageR) * (red - (int)averageR);
-                    sumG = sumG + (green - (int)averageG) * (green - (int)averageG);
-                    sumB = sumB + (blue - (int)averageB) * (blue - (int)averageB);
-                }
-
-                x = i;
-                y = j+1;
-
-                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
-                    red = new Color(original.getRGB(x, y)).getRed();
-                    green = new Color(original.getRGB(x, y)).getGreen();
-                    blue = new Color(original.getRGB(x, y)).getBlue();
-
-                    sumR = sumR + (red - (int)averageR) * (red - (int)averageR);
-                    sumG = sumG + (green - (int)averageG) * (green - (int)averageG);
-                    sumB = sumB + (blue - (int)averageB) * (blue - (int)averageB);
-                }
-
-                x = i+1;
-                y = j+1;
-
-                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
-                    red = new Color(original.getRGB(x, y)).getRed();
-                    green = new Color(original.getRGB(x, y)).getGreen();
-                    blue = new Color(original.getRGB(x, y)).getBlue();
-
-                    sumR = sumR + (red - (int)averageR) * (red - (int)averageR);
-                    sumG = sumG + (green - (int)averageG) * (green - (int)averageG);
-                    sumB = sumB + (blue - (int)averageB) * (blue - (int)averageB);
-                }
-
-                x = i-1;
-                y = j+1;
-
-                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
-                    red = new Color(original.getRGB(x, y)).getRed();
-                    green = new Color(original.getRGB(x, y)).getGreen();
-                    blue = new Color(original.getRGB(x, y)).getBlue();
-
-                    sumR = sumR + (red - (int)averageR) * (red - (int)averageR);
-                    sumG = sumG + (green - (int)averageG) * (green - (int)averageG);
-                    sumB = sumB + (blue - (int)averageB) * (blue - (int)averageB);
-                }
-
-                x = i-1;
-                y = j-1;
-
-                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
-                    red = new Color(original.getRGB(x, y)).getRed();
-                    green = new Color(original.getRGB(x, y)).getGreen();
-                    blue = new Color(original.getRGB(x, y)).getBlue();
-
-                    sumR = sumR + (red - (int)averageR) * (red - (int)averageR);
-                    sumG = sumG + (green - (int)averageG) * (green - (int)averageG);
-                    sumB = sumG + (blue - (int)averageB) * (blue - (int)averageB);
-                }
-
-                x = i+1;
-                y = j-1;
-
-                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
-                    red = new Color(original.getRGB(x, y)).getRed();
-                    green = new Color(original.getRGB(x, y)).getGreen();
-                    blue = new Color(original.getRGB(x, y)).getBlue();
-
-                    sumR = sumR + (red - (int)averageR) * (red - (int)averageR);
-                    sumG = sumG + (green - (int)averageG) * (green - (int)averageG);
-                    sumB = sumB + (blue - (int)averageB) * (blue - (int)averageB);
-                }
-
-                x = i-1;
-                y = j;
-
-                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
-                    red = new Color(original.getRGB(x, y)).getRed();
-                    green = new Color(original.getRGB(x, y)).getGreen();
-                    blue = new Color(original.getRGB(x, y)).getBlue();
-
-                    sumR = sumR + (red - (int)averageR) * (red - (int)averageR);
-                    sumG = sumG + (green - (int)averageG) * (green - (int)averageG);
-                    sumB = sumB + (blue - (int)averageB) * (blue - (int)averageB);
-                }
-
-                x = i+1;
-                y = j;
-
-                if (x > 0 && x < w-1 && y > 0 && y < h-1 ) {
-                    red = new Color(original.getRGB(x, y)).getRed();
-                    green = new Color(original.getRGB(x, y)).getGreen();
-                    blue = new Color(original.getRGB(x, y)).getBlue();
-
-                    sumR = sumR + (red - (int)averageR) * (red - (int)averageR);
-                    sumG = sumG + (green - (int)averageG) * (green - (int)averageG);
-                    sumB = sumB + (blue - (int)averageB) * (blue - (int)averageB);
-                }
-
-                deviationR = Math.sqrt(sumR/neighboursCounter);
-                deviationG = Math.sqrt(sumG/neighboursCounter);
-                deviationB = Math.sqrt(sumB/neighboursCounter);
-
-                TR[i][j] = averageR + k * deviationR;
-                TG[i][j] = averageG + k * deviationG;
-                TB[i][j] = averageB + k * deviationB;
-                // -----------------------
             }
         }
 
+        return resultImage;
+    }
 
-        for (int i = 0; i < w; i++) {
-            for (int j = 0; j < h; j++) {
-
-                Color color = new Color(original.getRGB(i, j));
-                red = color.getRed();
-                green = color.getGreen();
-                blue = color.getBlue();
-
-                if (red < TR[i][j]) {
-                    red = 0;
-                } else {
-                    red = 255;
-                }
-
-                if (green < TG[i][j]) {
-                    green = 0;
-                } else {
-                    green = 255;
-                }
-
-                if (blue < TB[i][j]) {
-                    blue = 0;
-                } else {
-                    blue = 255;
-                }
-
-                color = new Color(red, green, blue);
-                manuallyBinarizedImg.setRGB(i, j, color.getRGB());
-            }
-        }
-
-        return manuallyBinarizedImg;
+    private double getRGBLuminance(int rgb) {
+        Color color = new Color(rgb);
+        return (color.getRed() * 0.2126 + color.getGreen() * 0.7152 + color.getBlue() * 0.0722);
     }
 
     public BufferedImage percentBlackSelectionImageBinarization(BufferedImage imageArray, double percentage) {
@@ -953,7 +670,7 @@ public class HistogramsAndBinarizations extends javax.swing.JFrame implements Ch
     }
 
     private void niblackBinarizationActionPerformed(java.awt.event.ActionEvent evt) {
-        BufferedImage processedImage = niblackBinarization(imageArray, manualBinarizationValueSlider.getValue());
+        BufferedImage processedImage = niblackBinarization(imageArray);
         panel.setImg(processedImage);
     }
 
